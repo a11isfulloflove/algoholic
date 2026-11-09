@@ -15,7 +15,10 @@
     "lint": "npm run lint -w client && npm run lint -w server",
     "infra:up": "docker compose up -d",
     "infra:down": "docker compose down",
-    "judge:setup": "node scripts/install-piston-node.mjs"
+    "judge:setup": "node scripts/install-piston-node.mjs",
+    "db:migrate": "npm run db:migrate -w server",
+    "db:seed": "npm run db:seed -w server",
+    "db:studio": "npm run db:studio -w server"
   },
   "devDependencies": {
     "concurrently": "^9.2.0"

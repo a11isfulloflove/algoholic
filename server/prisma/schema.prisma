@@ -1,0 +1,98 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+enum Language {
+  JAVASCRIPT
+  TYPESCRIPT
+}
+
+enum SubmissionStatus {
+  PENDING
+  JUDGING
+  ACCEPTED
+  WRONG_ANSWER
+  TIME_LIMIT
+  RUNTIME_ERROR
+  COMPILE_ERROR
+  INTERNAL_ERROR
+}
+
+model User {
+  id           Int          @id @default(autoincrement())
+  email        String       @unique
+  passwordHash String
+  createdAt    DateTime     @default(now())
+  submissions  Submission[]
+}
+
+model Category {
+  id       Int       @id @default(autoincrement())
+  slug     String    @unique
+  name     String
+  problems Problem[]
+}
+
+model Problem {
+  id            Int          @id @default(autoincrement())
+  slug          String       @unique
+  title         String
+  description   String
+  difficulty    Difficulty
+  categoryId    Int
+  category      Category     @relation(fields: [categoryId], references: [id])
+  functionName  String
+  starterCodeJs String
+  starterCodeTs String
+  timeLimitMs   Int          @default(3000)
+  memoryLimitMb Int          @default(256)
+  isPublished   Boolean      @default(true)
+  tests         TestCase[]
+  submissions   Submission[]
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  @@index([categoryId, difficulty])
+}
+
+model TestCase {
+  id        Int     @id @default(autoincrement())
+  problemId Int
+  problem   Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  args      Json
+  expected  Json
+  isSample  Boolean @default(false)
+  orderIndex Int    @default(0)
+
+  @@index([problemId, orderIndex])
+}
+
+model Submission {
+  id              Int             @id @default(autoincrement())
+  userId          Int
+  user            User            @relation(fields: [userId], references: [id])
+  problemId       Int
+  problem         Problem         @relation(fields: [problemId], references: [id])
+  language        Language
+  code            String
+  status          SubmissionStatus @default(PENDING)
+  runtimeMs       Int?
+  memoryKb        Int?
+  failedTestIndex Int?
+  error           String?
+  createdAt       DateTime        @default(now())
+
+  @@index([userId, problemId, status])
+  @@index([problemId, createdAt])
+}

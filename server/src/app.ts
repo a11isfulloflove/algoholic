@@ -1,5 +1,7 @@
-import express from 'express'
+import express, { type ErrorRequestHandler } from 'express'
 import type { HealthResponse } from '@algoholic/shared'
+import { categoriesRouter } from './routes/categories'
+import { problemsRouter } from './routes/problems'
 
 export function createApp() {
   const app = express()
@@ -10,6 +12,19 @@ export function createApp() {
     const body: HealthResponse = { status: 'ok' }
     res.json(body)
   })
+
+  app.use('/api/categories', categoriesRouter)
+  app.use('/api/problems', problemsRouter)
+
+  app.use((req, res) => {
+    res.status(404).json({ error: 'not found' })
+  })
+
+  const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
+    console.error(err)
+    res.status(500).json({ error: 'internal server error' })
+  }
+  app.use(errorHandler)
 
   return app
 }
