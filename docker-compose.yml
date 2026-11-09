@@ -1,0 +1,35 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: algoholic-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: algoholic
+      POSTGRES_PASSWORD: algoholic
+      POSTGRES_DB: algoholic
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U algoholic -d algoholic"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  piston:
+    image: ghcr.io/engineer-man/piston
+    container_name: algoholic-piston
+    restart: unless-stopped
+    privileged: true
+    platform: linux/amd64
+    ports:
+      - "2000:2000"
+    volumes:
+      - piston-packages:/piston/packages
+      - piston-jobs:/piston/jobs
+
+volumes:
+  pgdata:
+  piston-packages:
+  piston-jobs:
