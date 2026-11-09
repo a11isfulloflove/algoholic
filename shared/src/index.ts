@@ -13,3 +13,49 @@ export type SubmissionStatus = (typeof SUBMISSION_STATUSES)[number]
 export interface HealthResponse {
   status: 'ok'
 }
+
+export interface CategorySummary {
+  slug: string
+  name: string
+  problemCount: number
+}
+
+export interface ProblemListItem {
+  slug: string
+  title: string
+  difficulty: Difficulty
+  category: {
+    slug: string
+    name: string
+  }
+}
+
+export interface ProblemListResponse {
+  items: ProblemListItem[]
+  total: number
+  page: number
+  pageSize: number
+}
+
+export interface SampleTestCase {
+  args: unknown[]
+  expected: unknown
+}
+
+export interface ProblemDetail {
+  slug: string
+  title: string
+  description: string
+  difficulty: Difficulty
+  category: {
+    slug: string
+    name: string
+  }
+  functionName: string
+  starterCodeJs: string
+  starterCodeTs: string
+  timeLimitMs: number
+  memoryLimitMb: number
+  samples: SampleTestCase[]
+  testCount: number
+}
