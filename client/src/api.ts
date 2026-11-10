@@ -3,6 +3,7 @@ import type {
   ProblemDetail,
   ProblemListResponse,
   RunSamplesResponse,
+  StatsResponse,
   SubmissionDetail,
   SubmissionListResponse,
   SubmitResponse,
@@ -77,4 +78,5 @@ export const api = {
     return request<SubmissionListResponse>(`/api/submissions${qs ? `?${qs}` : ''}`)
   },
   submission: (id: number) => request<SubmissionDetail>(`/api/submissions/${id}`),
+  stats: () => request<StatsResponse>('/api/stats'),
 }

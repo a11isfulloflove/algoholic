@@ -10,7 +10,7 @@ import { createRateLimiter } from '../rate-limit'
 
 export const authRouter = Router()
 
-const USER_SELECT = { id: true, email: true, name: true, avatar: true } as const
+const USER_SELECT = { id: true, email: true, name: true, avatar: true, createdAt: true } as const
 
 const nameSchema = z.string().trim().min(2).max(30)
 const avatarSchema = z.enum(AVATARS)
@@ -51,10 +51,11 @@ authRouter.post('/register', async (req, res) => {
   }
 
   const passwordHash = await hashPassword(password)
-  const user: UserPublic = await prisma.user.create({
+  const created = await prisma.user.create({
     data: { email, passwordHash, name, avatar },
     select: USER_SELECT,
   })
+  const user: UserPublic = { ...created, createdAt: created.createdAt.toISOString() }
 
   const token = await signSession({ userId: user.id })
   setSessionCookie(res, token)
@@ -81,6 +82,7 @@ authRouter.post('/login', loginLimiter, async (req, res) => {
       email: user.email,
       name: user.name,
       avatar: user.avatar,
+      createdAt: user.createdAt,
     },
   })
 })
@@ -115,11 +117,15 @@ authRouter.patch('/me', requireUser, async (req, res) => {
   if (parsed.data.name !== undefined) data.name = parsed.data.name
   if (parsed.data.avatar !== undefined) data.avatar = parsed.data.avatar
 
-  const updated: UserPublic = await prisma.user.update({
+  const updatedRow = await prisma.user.update({
     where: { id: user.id },
     data,
     select: USER_SELECT,
   })
+  const updated: UserPublic = {
+    ...updatedRow,
+    createdAt: updatedRow.createdAt.toISOString(),
+  }
 
   res.json({ user: updated })
 })

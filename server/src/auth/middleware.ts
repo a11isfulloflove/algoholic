@@ -12,7 +12,7 @@ declare global {
   }
 }
 
-const USER_SELECT = { id: true, email: true, name: true, avatar: true } as const
+const USER_SELECT = { id: true, email: true, name: true, avatar: true, createdAt: true } as const
 
 export async function attachUser(
   req: Request,
@@ -37,7 +37,7 @@ export async function attachUser(
       select: USER_SELECT,
     })
     if (user) {
-      req.user = user
+      req.user = { ...user, createdAt: user.createdAt.toISOString() }
     }
     next()
   } catch (err) {
@@ -72,7 +72,7 @@ export async function requireUser(
       return
     }
 
-    req.user = user
+    req.user = { ...user, createdAt: user.createdAt.toISOString() }
     next()
   } catch (err) {
     next(err)

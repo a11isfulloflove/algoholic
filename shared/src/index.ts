@@ -25,6 +25,7 @@ export interface ProblemListItem {
   slug: string
   title: string
   difficulty: Difficulty
+  solved: boolean
   category: {
     slug: string
     name: string
@@ -48,6 +49,7 @@ export interface ProblemDetail {
   title: string
   description: string
   difficulty: Difficulty
+  solved: boolean
   category: {
     slug: string
     name: string
@@ -101,6 +103,28 @@ export interface UserPublic {
   email: string
   name: string | null
   avatar: string | null
+  createdAt: string
+}
+
+export interface DifficultyProgress {
+  solved: number
+  total: number
+}
+
+export interface CategoryProgress {
+  slug: string
+  name: string
+  solved: number
+  total: number
+}
+
+export interface StatsResponse {
+  solvedTotal: number
+  problemsTotal: number
+  submissions: number
+  accepted: number
+  byDifficulty: Record<Difficulty, DifficultyProgress>
+  byCategory: CategoryProgress[]
 }
 
 export interface TestCaseResult {

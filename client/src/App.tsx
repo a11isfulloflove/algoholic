@@ -4,6 +4,7 @@ import { LoginPage } from './pages/LoginPage'
 import { NotFoundPage } from './pages/NotFoundPage'
 import { ProblemPage } from './pages/ProblemPage'
 import { ProblemsPage } from './pages/ProblemsPage'
+import { ProfilePage } from './pages/ProfilePage'
 import { RegisterPage } from './pages/RegisterPage'
 import { SubmissionDetailPage } from './pages/SubmissionDetailPage'
 import { SubmissionsPage } from './pages/SubmissionsPage'
@@ -17,6 +18,7 @@ export default function App() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/problems" element={<ProblemsPage />} />
         <Route path="/problems/:slug" element={<ProblemPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
         <Route path="/submissions" element={<SubmissionsPage />} />
         <Route path="/submissions/:id" element={<SubmissionDetailPage />} />
         <Route path="*" element={<NotFoundPage />} />

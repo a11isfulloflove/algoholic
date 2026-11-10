@@ -4,6 +4,7 @@ import type { HealthResponse } from '@algoholic/shared'
 import { authRouter } from './routes/auth'
 import { categoriesRouter } from './routes/categories'
 import { problemsRouter } from './routes/problems'
+import { statsRouter } from './routes/stats'
 import { submissionsRouter } from './routes/submissions'
 
 export function createApp() {
@@ -22,6 +23,7 @@ export function createApp() {
   app.use('/api/categories', categoriesRouter)
   app.use('/api/problems', problemsRouter)
   app.use('/api/submissions', submissionsRouter)
+  app.use('/api/stats', statsRouter)
 
   app.use((req, res) => {
     res.status(404).json({ error: 'not found' })
