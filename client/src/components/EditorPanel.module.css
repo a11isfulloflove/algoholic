@@ -92,6 +92,20 @@
   color: #b8b6bd;
 }
 
+.runButton:disabled,
+.actionButton:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.errorNote {
+  padding: 10px 16px;
+  background: var(--hard-bg);
+  color: var(--hard);
+  font-size: 13px;
+  border-top: 1px solid var(--border);
+}
+
 .authNote {
   padding: 12px 16px;
   background: var(--accent-soft);

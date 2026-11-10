@@ -2,6 +2,8 @@ import type {
   CategorySummary,
   ProblemDetail,
   ProblemListResponse,
+  RunSamplesResponse,
+  SubmitResponse,
 } from '@algoholic/shared'
 
 export class ApiError extends Error {
@@ -55,4 +57,14 @@ export const api = {
     return request<ProblemListResponse>(`/api/problems${qs ? `?${qs}` : ''}`)
   },
   problem: (slug: string) => request<ProblemDetail>(`/api/problems/${slug}`),
+  run: (slug: string, body: { language: string; code: string }) =>
+    request<RunSamplesResponse>(`/api/problems/${slug}/run`, {
+      method: 'POST',
+      body: JSON.stringify(body),
+    }),
+  submit: (slug: string, body: { language: string; code: string }) =>
+    request<SubmitResponse>(`/api/problems/${slug}/submit`, {
+      method: 'POST',
+      body: JSON.stringify(body),
+    }),
 }
