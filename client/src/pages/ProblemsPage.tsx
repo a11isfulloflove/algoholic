@@ -31,9 +31,12 @@ export function ProblemsPage() {
     return () => clearTimeout(t)
   }, [search])
 
-  useEffect(() => {
+  const filterKey = `${category}|${difficulty}|${debouncedSearch}`
+  const [lastFilterKey, setLastFilterKey] = useState(filterKey)
+  if (filterKey !== lastFilterKey) {
+    setLastFilterKey(filterKey)
     setPage(1)
-  }, [category, difficulty, debouncedSearch])
+  }
 
   const params = useMemo(() => {
     const p: Record<string, string> = { page: String(page), pageSize: String(PAGE_SIZE) }
