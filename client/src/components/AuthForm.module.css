@@ -44,6 +44,35 @@
   border-color: var(--accent);
 }
 
+.passwordWrap {
+  position: relative;
+}
+
+.passwordInput {
+  padding-right: 44px;
+}
+
+.toggle {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--text-soft);
+  border-radius: 6px;
+}
+
+.toggle:hover {
+  color: var(--accent-text);
+  background: var(--accent-soft);
+}
+
 .error {
   background: var(--danger-bg);
   color: var(--danger);
