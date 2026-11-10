@@ -16,6 +16,11 @@ export function Layout() {
             <Link to="/problems" className={styles.navLink}>
               Problems
             </Link>
+            {user && (
+              <Link to="/submissions" className={styles.navLink}>
+                Submissions
+              </Link>
+            )}
             {user ? (
               <>
                 <Link to="/profile" className={styles.userChip} title="your profile">

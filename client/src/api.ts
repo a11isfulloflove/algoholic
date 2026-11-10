@@ -3,6 +3,8 @@ import type {
   ProblemDetail,
   ProblemListResponse,
   RunSamplesResponse,
+  SubmissionDetail,
+  SubmissionListResponse,
   SubmitResponse,
   UserPublic,
 } from '@algoholic/shared'
@@ -70,4 +72,9 @@ export const api = {
       method: 'POST',
       body: JSON.stringify(body),
     }),
+  submissions: (params: Record<string, string>) => {
+    const qs = new URLSearchParams(params).toString()
+    return request<SubmissionListResponse>(`/api/submissions${qs ? `?${qs}` : ''}`)
+  },
+  submission: (id: number) => request<SubmissionDetail>(`/api/submissions/${id}`),
 }

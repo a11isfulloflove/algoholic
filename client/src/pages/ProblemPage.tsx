@@ -11,6 +11,7 @@ import styles from './ProblemPage.module.css'
 export function ProblemPage() {
   const { slug } = useParams<{ slug: string }>()
   const [problem, setProblem] = useState<ProblemDetail | null>(null)
+  const [solved, setSolved] = useState(false)
   const [loading, setLoading] = useState(true)
   const [notFound, setNotFound] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -29,7 +30,10 @@ export function ProblemPage() {
     api
       .problem(slug)
       .then((p) => {
-        if (active) setProblem(p)
+        if (active) {
+          setProblem(p)
+          setSolved(p.solved)
+        }
       })
       .catch((err) => {
         if (!active) return
@@ -72,6 +76,11 @@ export function ProblemPage() {
       <div className={styles.header}>
         <h1 className={styles.title}>{problem.title}</h1>
         <DifficultyBadge difficulty={problem.difficulty} />
+        {solved && (
+          <span className={styles.solvedBadge} title="you solved this one">
+            ✓ solved
+          </span>
+        )}
         <span className={styles.title} style={{ fontSize: 14, color: 'var(--text-soft)' }}>
           {problem.category.name}
         </span>
@@ -118,6 +127,11 @@ export function ProblemPage() {
             slug={problem.slug}
             starterCodeJs={problem.starterCodeJs}
             starterCodeTs={problem.starterCodeTs}
+            onSubmitResult={(result) => {
+              if (result.status === 'accepted') {
+                setSolved(true)
+              }
+            }}
           />
         </section>
       </div>

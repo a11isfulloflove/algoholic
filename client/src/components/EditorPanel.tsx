@@ -11,6 +11,7 @@ interface EditorPanelProps {
   slug: string
   starterCodeJs: string
   starterCodeTs: string
+  onSubmitResult?: (result: SubmitResponse) => void
 }
 
 function draftKey(slug: string, language: Language): string {
@@ -32,7 +33,12 @@ function friendlyError(err: unknown, fallback: string): string {
   return err instanceof Error ? err.message : fallback
 }
 
-export function EditorPanel({ slug, starterCodeJs, starterCodeTs }: EditorPanelProps) {
+export function EditorPanel({
+  slug,
+  starterCodeJs,
+  starterCodeTs,
+  onSubmitResult,
+}: EditorPanelProps) {
   const { user } = useAuth()
   const [language, setLanguage] = useState<Language>('javascript')
   const [code, setCode] = useState<string>(
@@ -98,7 +104,9 @@ export function EditorPanel({ slug, starterCodeJs, starterCodeTs }: EditorPanelP
     setError(null)
     setRunResult(null)
     try {
-      setSubmitResult(await api.submit(slug, { language, code }))
+      const result = await api.submit(slug, { language, code })
+      setSubmitResult(result)
+      onSubmitResult?.(result)
     } catch (err) {
       setError(friendlyError(err, 'submit failed'))
       setSubmitResult(null)

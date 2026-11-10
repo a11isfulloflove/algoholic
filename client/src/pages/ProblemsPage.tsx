@@ -2,11 +2,13 @@ import { useEffect, useMemo, useState } from 'react'
 import { api } from '../api'
 import type { CategorySummary, ProblemListResponse } from '@algoholic/shared'
 import { ProblemTable } from '../components/ProblemTable'
+import { useAuth } from '../use-auth'
 import styles from './ProblemsPage.module.css'
 
 const PAGE_SIZE = 20
 
 export function ProblemsPage() {
+  const { user } = useAuth()
   const [categories, setCategories] = useState<CategorySummary[]>([])
   const [data, setData] = useState<ProblemListResponse | null>(null)
   const [loading, setLoading] = useState(true)
@@ -14,6 +16,7 @@ export function ProblemsPage() {
 
   const [category, setCategory] = useState('')
   const [difficulty, setDifficulty] = useState('')
+  const [status, setStatus] = useState('')
   const [search, setSearch] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')
   const [page, setPage] = useState(1)
@@ -30,7 +33,7 @@ export function ProblemsPage() {
     return () => clearTimeout(t)
   }, [search])
 
-  const filterKey = `${category}|${difficulty}|${debouncedSearch}`
+  const filterKey = `${category}|${difficulty}|${status}|${debouncedSearch}`
   const [lastFilterKey, setLastFilterKey] = useState(filterKey)
   if (filterKey !== lastFilterKey) {
     setLastFilterKey(filterKey)
@@ -41,9 +44,10 @@ export function ProblemsPage() {
     const p: Record<string, string> = { page: String(page), pageSize: String(PAGE_SIZE) }
     if (category) p.category = category
     if (difficulty) p.difficulty = difficulty
+    if (status) p.status = status
     if (debouncedSearch) p.q = debouncedSearch
     return p
-  }, [page, category, difficulty, debouncedSearch])
+  }, [page, category, difficulty, status, debouncedSearch])
 
   const paramsKey = JSON.stringify(params)
   const [lastParamsKey, setLastParamsKey] = useState(paramsKey)
@@ -112,6 +116,17 @@ export function ProblemsPage() {
           <option value="medium">medium</option>
           <option value="hard">hard</option>
         </select>
+        {user && (
+          <select
+            className={styles.select}
+            value={status}
+            onChange={(e) => setStatus(e.target.value)}
+          >
+            <option value="">solved & unsolved</option>
+            <option value="solved">solved</option>
+            <option value="unsolved">unsolved</option>
+          </select>
+        )}
       </div>
 
       {error && <div className={styles.message}>{error}</div>}

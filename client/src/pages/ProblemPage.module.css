@@ -27,7 +27,17 @@
 }
 
 @media (max-width: 1100px) {
-  .layout {
+.solvedBadge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--easy-bg);
+  color: var(--easy);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.layout {
     grid-template-columns: 1fr;
   }
 }
