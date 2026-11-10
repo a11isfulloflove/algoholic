@@ -23,6 +23,10 @@ services:
     restart: unless-stopped
     privileged: true
     platform: linux/amd64
+    environment:
+      - PISTON_OUTPUT_MAX_SIZE=1000000
+      - PISTON_RUN_TIMEOUT=10000
+      - PISTON_RUN_CPU_TIME=10000
     ports:
       - "2000:2000"
     volumes:

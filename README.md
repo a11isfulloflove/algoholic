@@ -34,11 +34,21 @@ npm run dev             # client on :5173 (proxies /api), server on :4000
 | `npm run dev:client` / `npm run dev:server` | Run just one workspace |
 | `npm run build` | Build client + server |
 | `npm run lint` | Lint all workspaces (oxlint) |
+| `npm test` | Run server unit tests (vitest) |
 | `npm run infra:up` / `npm run infra:down` | Start / stop the docker stack |
 | `npm run judge:setup` | Install node into piston and run a smoke test |
 | `npm run db:migrate` | Apply database migrations (dev) |
 | `npm run db:seed` | Seed categories and problems (idempotent) |
 | `npm run db:studio` | Browse the database in Prisma Studio |
+
+## The judge
+
+Solutions run in a [Piston](https://github.com/engineer-man/piston) sandbox (isolated Linux namespaces, no network, CPU/memory/time caps). Flow:
+
+1. Server validates and transpiles the submission (esbuild; TS and JS syntax errors become compile errors)
+2. User code is wrapped in a harness that calls the exported function with each test case and prints one JSON result per test
+3. All tests execute in one sandbox run (per-problem time limit + headroom)
+4. Results are compared server-side (canonical JSON, key-order-insensitive, float tolerance); hidden test expectations never leave the server
 
 ## API
 
@@ -51,3 +61,7 @@ npm run dev             # client on :5173 (proxies /api), server on :4000
 | `GET /api/categories` | Categories with problem counts |
 | `GET /api/problems` | List problems — filters: `category`, `difficulty`, `q`, `page`, `pageSize` |
 | `GET /api/problems/:slug` | Problem statement, sample tests, starter code |
+| `POST /api/problems/:slug/run` | Run code against sample tests (requires auth) |
+| `POST /api/problems/:slug/submit` | Submit for judging against all tests (requires auth) |
+| `GET /api/submissions` | Own submission history — filter: `problem`, `page`, `pageSize` |
+| `GET /api/submissions/:id` | Own submission detail with code |

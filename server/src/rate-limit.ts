@@ -5,8 +5,13 @@ interface Bucket {
   resetAt: number
 }
 
-export function createRateLimiter(options: { windowMs: number; max: number }) {
+export function createRateLimiter(options: {
+  windowMs: number
+  max: number
+  key?: (req: Request) => string
+}) {
   const buckets = new Map<string, Bucket>()
+  const keyFn = options.key ?? ((req: Request) => req.ip ?? 'unknown')
 
   const cleanup = setInterval(() => {
     const now = Date.now()
@@ -19,7 +24,7 @@ export function createRateLimiter(options: { windowMs: number; max: number }) {
   cleanup.unref()
 
   return (req: Request, res: Response, next: NextFunction): void => {
-    const key = req.ip ?? 'unknown'
+    const key = keyFn(req)
     const now = Date.now()
     const bucket = buckets.get(key)
 
