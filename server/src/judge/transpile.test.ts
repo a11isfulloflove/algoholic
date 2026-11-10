@@ -9,23 +9,32 @@ describe('transpile', () => {
     )
 
     expect(result.ok).toBe(true)
-    expect(result.code).toContain('double')
+    if (result.ok) {
+      expect(result.code).toContain('double')
+    }
   })
 
   it('reports typescript syntax errors with location', () => {
     const bad = transpile('function broken( { return 1 }', 'typescript')
+
     expect(bad.ok).toBe(false)
-    expect(bad.error).toMatch(/\d+:\d+/)
+    if (!bad.ok) {
+      expect(bad.error).toMatch(/\d+:\d+/)
+    }
   })
 
   it('acts as a syntax gate for javascript', () => {
     const bad = transpile('function broken( { return 1 }', 'javascript')
+
     expect(bad.ok).toBe(false)
-    expect(bad.error).toBeTruthy()
+    if (!bad.ok) {
+      expect(bad.error).toBeTruthy()
+    }
   })
 
   it('accepts valid javascript untouched in semantics', () => {
     const result = transpile('function ok() { return 42 }\nmodule.exports = ok', 'javascript')
+
     expect(result.ok).toBe(true)
   })
 })

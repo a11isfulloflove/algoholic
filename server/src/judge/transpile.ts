@@ -1,11 +1,7 @@
 import { transformSync } from 'esbuild'
 import type { Language } from '@algoholic/shared'
 
-export interface TranspileResult {
-  ok: boolean
-  code?: string
-  error?: string
-}
+export type TranspileResult = { ok: true; code: string } | { ok: false; error: string }
 
 interface EsbuildErrorLocation {
   line?: number

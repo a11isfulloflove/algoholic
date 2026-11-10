@@ -7,6 +7,7 @@ export const SUBMISSION_STATUSES = [
   'time_limit',
   'runtime_error',
   'compile_error',
+  'internal_error',
 ] as const
 export type SubmissionStatus = (typeof SUBMISSION_STATUSES)[number]
 
