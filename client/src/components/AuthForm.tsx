@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router'
+import { AVATARS } from '@algoholic/shared'
 import { useAuth } from '../use-auth'
 import styles from './AuthForm.module.css'
 
@@ -49,6 +50,8 @@ export function AuthForm({ mode }: AuthFormProps) {
   const { login, register } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [name, setName] = useState('')
+  const [avatar, setAvatar] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
@@ -63,7 +66,7 @@ export function AuthForm({ mode }: AuthFormProps) {
       if (isLogin) {
         await login(email, password)
       } else {
-        await register(email, password)
+        await register(email, password, name.trim() || undefined, avatar ?? undefined)
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'something went wrong')
@@ -93,6 +96,23 @@ export function AuthForm({ mode }: AuthFormProps) {
             required
           />
         </div>
+        {!isLogin && (
+          <div className={styles.field}>
+            <label htmlFor="name" className={styles.label}>
+              name <span className={styles.optional}>(optional)</span>
+            </label>
+            <input
+              id="name"
+              type="text"
+              className={styles.input}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="how should we call you?"
+              autoComplete="nickname"
+              maxLength={30}
+            />
+          </div>
+        )}
         <div className={styles.field}>
           <label htmlFor="password" className={styles.label}>
             password
@@ -119,6 +139,27 @@ export function AuthForm({ mode }: AuthFormProps) {
             </button>
           </div>
         </div>
+        {!isLogin && (
+          <div className={styles.field}>
+            <span className={styles.label}>
+              pick your avatar <span className={styles.optional}>(optional)</span>
+            </span>
+            <div className={styles.avatarGrid}>
+              {AVATARS.map((a) => (
+                <button
+                  key={a}
+                  type="button"
+                  className={`${styles.avatarButton} ${avatar === a ? styles.avatarActive : ''}`}
+                  onClick={() => setAvatar(avatar === a ? null : a)}
+                  aria-pressed={avatar === a}
+                  aria-label={`avatar ${a}`}
+                >
+                  {a}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
         <button type="submit" className={styles.submit} disabled={busy}>
           {busy ? 'one moment…' : isLogin ? 'log in' : 'create account'}
         </button>

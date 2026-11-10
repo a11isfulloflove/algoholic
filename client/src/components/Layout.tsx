@@ -18,7 +18,12 @@ export function Layout() {
             </Link>
             {user ? (
               <>
-                <span className={styles.userEmail}>{user.email}</span>
+                <Link to="/profile" className={styles.userChip} title="your profile">
+                  <span className={styles.userAvatar}>{user.avatar ?? '🙂'}</span>
+                  <span className={styles.userName}>
+                    {user.name ?? user.email.split('@')[0]}
+                  </span>
+                </Link>
                 <button type="button" className={styles.logoutButton} onClick={() => logout()}>
                   log out
                 </button>

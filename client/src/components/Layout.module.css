@@ -53,9 +53,41 @@
   text-decoration: none;
 }
 
-.userEmail {
-  color: var(--text-soft);
+.userChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px 4px 6px;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
   font-size: 14px;
+  font-weight: 600;
+}
+
+.userChip:hover {
+  border-color: var(--accent);
+  text-decoration: none;
+}
+
+.userAvatar {
+  font-size: 18px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  background: var(--accent-soft);
+  border-radius: 50%;
+}
+
+.userName {
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .logoutButton {

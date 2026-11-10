@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState, type ReactNode } from 'react'
-import { api } from './api'
+import { api, type AuthUser } from './api'
 import { AuthContext, type AuthContextValue } from './auth-context'
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -19,18 +19,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(r.user)
   }, [])
 
-  const register = useCallback(async (email: string, password: string) => {
-    const r = await api.register(email, password)
-    setUser(r.user)
-  }, [])
+  const register = useCallback(
+    async (email: string, password: string, name?: string, avatar?: string) => {
+      const r = await api.register(email, password, name, avatar)
+      setUser(r.user)
+    },
+    [],
+  )
 
   const logout = useCallback(async () => {
     await api.logout()
     setUser(null)
   }, [])
 
+  const updateUser = useCallback((nextUser: AuthUser) => {
+    setUser(nextUser)
+  }, [])
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+    <AuthContext.Provider
+      value={{ user, loading, login, register, logout, updateUser }}
+    >
       {children}
     </AuthContext.Provider>
   )

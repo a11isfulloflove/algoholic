@@ -4,6 +4,7 @@ import type {
   ProblemListResponse,
   RunSamplesResponse,
   SubmitResponse,
+  UserPublic,
 } from '@algoholic/shared'
 
 export class ApiError extends Error {
@@ -33,10 +34,7 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
   return (await res.json()) as T
 }
 
-export interface AuthUser {
-  id: number
-  email: string
-}
+export type AuthUser = UserPublic
 
 export const api = {
   me: () => request<{ user: AuthUser }>('/api/auth/me'),
@@ -45,12 +43,17 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ email, password }),
     }),
-  register: (email: string, password: string) =>
+  register: (email: string, password: string, name?: string, avatar?: string) =>
     request<{ user: AuthUser }>('/api/auth/register', {
       method: 'POST',
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ email, password, name, avatar }),
     }),
   logout: () => request<{ ok: boolean }>('/api/auth/logout', { method: 'POST' }),
+  updateProfile: (body: { name?: string; avatar?: string }) =>
+    request<{ user: AuthUser }>('/api/auth/me', {
+      method: 'PATCH',
+      body: JSON.stringify(body),
+    }),
   categories: () => request<CategorySummary[]>('/api/categories'),
   problems: (params: Record<string, string>) => {
     const qs = new URLSearchParams(params).toString()

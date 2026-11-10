@@ -64,6 +64,45 @@ export interface ProblemDetail {
 export const LANGUAGES = ['javascript', 'typescript'] as const
 export type Language = (typeof LANGUAGES)[number]
 
+export const AVATARS = [
+  '🦊',
+  '🐼',
+  '🐸',
+  '🐙',
+  '🦄',
+  '🐱',
+  '🐶',
+  '🐨',
+  '🐯',
+  '🦁',
+  '🐮',
+  '🐷',
+  '🐰',
+  '🐵',
+  '🦉',
+  '🐢',
+  '🦋',
+  '🐳',
+  '🐬',
+  '🦕',
+  '🐿️',
+  '🦔',
+  '🐺',
+  '👾',
+  '🤖',
+  '👻',
+  '⚡',
+  '🔮',
+] as const
+export type Avatar = (typeof AVATARS)[number]
+
+export interface UserPublic {
+  id: number
+  email: string
+  name: string | null
+  avatar: string | null
+}
+
 export interface TestCaseResult {
   index: number
   ok: boolean

@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import { z } from 'zod'
+import { AVATARS, type UserPublic } from '@algoholic/shared'
 import { prisma } from '../db'
 import { hashPassword, verifyPassword } from '../auth/password'
 import { signSession } from '../auth/tokens'
@@ -9,15 +10,30 @@ import { createRateLimiter } from '../rate-limit'
 
 export const authRouter = Router()
 
-const credentialsSchema = z.object({
+const USER_SELECT = { id: true, email: true, name: true, avatar: true } as const
+
+const nameSchema = z.string().trim().min(2).max(30)
+const avatarSchema = z.enum(AVATARS)
+
+const loginSchema = z.object({
   email: z.string().trim().toLowerCase().email(),
   password: z.string().min(8).max(100),
+})
+
+const registerSchema = loginSchema.extend({
+  name: nameSchema.optional(),
+  avatar: avatarSchema.optional(),
+})
+
+const profileUpdateSchema = z.object({
+  name: nameSchema.optional(),
+  avatar: avatarSchema.optional(),
 })
 
 const loginLimiter = createRateLimiter({ windowMs: 60_000, max: 5 })
 
 authRouter.post('/register', async (req, res) => {
-  const parsed = credentialsSchema.safeParse(req.body)
+  const parsed = registerSchema.safeParse(req.body)
   if (!parsed.success) {
     return res.status(400).json({
       error: 'invalid input',
@@ -28,16 +44,16 @@ authRouter.post('/register', async (req, res) => {
     })
   }
 
-  const { email, password } = parsed.data
+  const { email, password, name, avatar } = parsed.data
   const existing = await prisma.user.findUnique({ where: { email } })
   if (existing) {
     return res.status(409).json({ error: 'email already registered' })
   }
 
   const passwordHash = await hashPassword(password)
-  const user = await prisma.user.create({
-    data: { email, passwordHash },
-    select: { id: true, email: true },
+  const user: UserPublic = await prisma.user.create({
+    data: { email, passwordHash, name, avatar },
+    select: USER_SELECT,
   })
 
   const token = await signSession({ userId: user.id })
@@ -46,7 +62,7 @@ authRouter.post('/register', async (req, res) => {
 })
 
 authRouter.post('/login', loginLimiter, async (req, res) => {
-  const parsed = credentialsSchema.safeParse(req.body)
+  const parsed = loginSchema.safeParse(req.body)
   if (!parsed.success) {
     return res.status(400).json({ error: 'invalid input' })
   }
@@ -59,7 +75,14 @@ authRouter.post('/login', loginLimiter, async (req, res) => {
 
   const token = await signSession({ userId: user.id })
   setSessionCookie(res, token)
-  res.json({ user: { id: user.id, email: user.email } })
+  res.json({
+    user: {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      avatar: user.avatar,
+    },
+  })
 })
 
 authRouter.post('/logout', (_req, res) => {
@@ -69,4 +92,34 @@ authRouter.post('/logout', (_req, res) => {
 
 authRouter.get('/me', requireUser, (req, res) => {
   res.json({ user: req.user })
+})
+
+authRouter.patch('/me', requireUser, async (req, res) => {
+  const user = req.user
+  if (!user) {
+    return res.status(401).json({ error: 'authentication required' })
+  }
+
+  const parsed = profileUpdateSchema.safeParse(req.body)
+  if (!parsed.success) {
+    return res.status(400).json({
+      error: 'invalid input',
+      details: parsed.error.issues.map((i) => ({
+        path: i.path.join('.'),
+        message: i.message,
+      })),
+    })
+  }
+
+  const data: { name?: string; avatar?: string } = {}
+  if (parsed.data.name !== undefined) data.name = parsed.data.name
+  if (parsed.data.avatar !== undefined) data.avatar = parsed.data.avatar
+
+  const updated: UserPublic = await prisma.user.update({
+    where: { id: user.id },
+    data,
+    select: USER_SELECT,
+  })
+
+  res.json({ user: updated })
 })

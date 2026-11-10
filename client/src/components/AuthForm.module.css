@@ -108,3 +108,35 @@
   color: var(--text-soft);
   text-align: center;
 }
+
+.optional {
+  font-weight: 400;
+  opacity: 0.7;
+}
+
+.avatarGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+}
+
+.avatarButton {
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  border-radius: 8px;
+  font-size: 20px;
+  padding: 6px 0;
+  line-height: 1.4;
+  transition: transform 0.08s ease;
+}
+
+.avatarButton:hover {
+  border-color: var(--accent);
+  transform: scale(1.08);
+}
+
+.avatarActive {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-soft);
+}
