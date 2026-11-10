@@ -44,7 +44,7 @@ export function ProfilePage() {
   if (!loading && !user) {
     return (
       <div className={styles.message}>
-        <a href="/login">log in</a> to see your profile 💗
+        <Link to="/login">log in</Link> to see your profile 💗
       </div>
     )
   }

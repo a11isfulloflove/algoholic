@@ -50,18 +50,29 @@ Solutions run in a [Piston](https://github.com/engineer-man/piston) sandbox (iso
 3. All tests execute in one sandbox run (per-problem time limit + headroom)
 4. Results are compared server-side (canonical JSON, key-order-insensitive, float tolerance); hidden test expectations never leave the server
 
+## The app
+
+| Page | What |
+|---|---|
+| `/problems` | Browse, filter (category / difficulty / solved / search), solved ✓ marks |
+| `/problems/:slug` | Statement + samples on the left, CodeMirror editor with Run/Submit on the right (`Ctrl/Cmd+Enter` to submit), drafts saved locally |
+| `/profile` | Your emoji avatar + name, progress by difficulty and category, acceptance rate, recent submissions |
+| `/submissions` | Full submission history with code viewer |
+
+Users pick an emoji avatar and a display name at registration (editable on the profile page) — no personal data beyond an email.
+
 ## API
 
 | Endpoint | Description |
 |---|---|
 | `GET /api/health` | Liveness check |
-| `POST /api/auth/register` | Create account (email + password, min 8 chars) |
+| `POST /api/auth/register` | Create account (email, password, optional name + emoji avatar) |
 | `POST /api/auth/login` / `POST /api/auth/logout` | Session via httpOnly JWT cookie |
-| `GET /api/auth/me` | Current user (requires auth) |
+| `GET /api/auth/me` · `PATCH /api/auth/me` | Current user · update name/avatar |
 | `GET /api/categories` | Categories with problem counts |
-| `GET /api/problems` | List problems — filters: `category`, `difficulty`, `q`, `page`, `pageSize` |
-| `GET /api/problems/:slug` | Problem statement, sample tests, starter code |
+| `GET /api/problems` | List — filters: `category`, `difficulty`, `status` (solved/unsolved), `q`, `page` |
+| `GET /api/problems/:slug` | Statement, samples, starter code, solved flag |
 | `POST /api/problems/:slug/run` | Run code against sample tests (requires auth) |
 | `POST /api/problems/:slug/submit` | Submit for judging against all tests (requires auth) |
-| `GET /api/submissions` | Own submission history — filter: `problem`, `page`, `pageSize` |
-| `GET /api/submissions/:id` | Own submission detail with code |
+| `GET /api/submissions` | Own history — filter: `problem`, `page` · `GET /api/submissions/:id` for code |
+| `GET /api/stats` | Personal progress: solved by difficulty and category, acceptance rate |

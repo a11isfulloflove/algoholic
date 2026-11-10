@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useSearchParams } from 'react-router'
+import { Link, useSearchParams } from 'react-router'
 import { api } from '../api'
 import type { SubmissionListResponse } from '@algoholic/shared'
 import { SubmissionsTable } from '../components/SubmissionsTable'
@@ -94,7 +94,7 @@ export function SubmissionsPage() {
       {loading && !data && <div className={styles.message}>loading submissions…</div>}
       {!loading && data && data.items.length === 0 && (
         <div className={styles.message}>
-          no submissions yet — go <a href="/problems">solve something</a>! 💪
+          no submissions yet — go <Link to="/problems">solve something</Link>! 💪
         </div>
       )}
 
