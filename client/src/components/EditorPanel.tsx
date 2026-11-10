@@ -1,8 +1,8 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import CodeMirror from '@uiw/react-codemirror'
 import { javascript } from '@codemirror/lang-javascript'
 import type { Language, RunSamplesResponse, SubmitResponse } from '@algoholic/shared'
-import { api } from '../api'
+import { api, ApiError } from '../api'
 import { useAuth } from '../use-auth'
 import { RunResultsView, SubmitResultsView } from './ResultsPanel'
 import styles from './EditorPanel.module.css'
@@ -25,6 +25,13 @@ function loadDraft(slug: string, language: Language): string | null {
   }
 }
 
+function friendlyError(err: unknown, fallback: string): string {
+  if (err instanceof ApiError && err.status === 429) {
+    return 'easy there — the judge needs a breather (15 requests per minute)'
+  }
+  return err instanceof Error ? err.message : fallback
+}
+
 export function EditorPanel({ slug, starterCodeJs, starterCodeTs }: EditorPanelProps) {
   const { user } = useAuth()
   const [language, setLanguage] = useState<Language>('javascript')
@@ -35,6 +42,7 @@ export function EditorPanel({ slug, starterCodeJs, starterCodeTs }: EditorPanelP
   const [submitResult, setSubmitResult] = useState<SubmitResponse | null>(null)
   const [busy, setBusy] = useState<'run' | 'submit' | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const submitRef = useRef<() => void>(() => {})
 
   const starter = language === 'javascript' ? starterCodeJs : starterCodeTs
 
@@ -49,10 +57,11 @@ export function EditorPanel({ slug, starterCodeJs, starterCodeTs }: EditorPanelP
     return () => clearTimeout(t)
   }, [slug, language, code])
 
-  const extensions = useMemo(
-    () => [javascript({ typescript: language === 'typescript' })],
+  const languageExtension = useMemo(
+    () => javascript({ typescript: language === 'typescript' }),
     [language],
   )
+  const extensions = useMemo(() => [languageExtension], [languageExtension])
 
   function switchLanguage(next: Language) {
     if (next === language) return
@@ -76,7 +85,7 @@ export function EditorPanel({ slug, starterCodeJs, starterCodeTs }: EditorPanelP
     try {
       setRunResult(await api.run(slug, { language, code }))
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'run failed')
+      setError(friendlyError(err, 'run failed'))
       setRunResult(null)
     } finally {
       setBusy(null)
@@ -84,18 +93,38 @@ export function EditorPanel({ slug, starterCodeJs, starterCodeTs }: EditorPanelP
   }
 
   async function handleSubmit() {
+    if (!user) return
     setBusy('submit')
     setError(null)
     setRunResult(null)
     try {
       setSubmitResult(await api.submit(slug, { language, code }))
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'submit failed')
+      setError(friendlyError(err, 'submit failed'))
       setSubmitResult(null)
     } finally {
       setBusy(null)
     }
   }
+
+  useEffect(() => {
+    submitRef.current = () => {
+      if (busy === null && user) {
+        void handleSubmit()
+      }
+    }
+  })
+
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+        e.preventDefault()
+        submitRef.current()
+      }
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [])
 
   return (
     <div className={styles.panel}>
@@ -133,9 +162,13 @@ export function EditorPanel({ slug, starterCodeJs, starterCodeTs }: EditorPanelP
           className={styles.runButton}
           onClick={handleSubmit}
           disabled={busy !== null || !user}
+          title="Ctrl/Cmd + Enter"
         >
           {busy === 'submit' ? 'submitting…' : 'submit'}
         </button>
+        <span className={styles.kbdHint} title="Ctrl/Cmd + Enter">
+          ⌘↵
+        </span>
       </div>
       <div className={styles.editor}>
         <CodeMirror
@@ -149,6 +182,11 @@ export function EditorPanel({ slug, starterCodeJs, starterCodeTs }: EditorPanelP
       {!user && (
         <div className={styles.authNote}>
           <a href="/login">log in</a> to run your code against the samples and submit for judging
+        </div>
+      )}
+      {busy !== null && (
+        <div className={styles.judgingNote}>
+          {busy === 'run' ? 'running against samples…' : 'the judge is thinking…'}
         </div>
       )}
       {error && <div className={styles.errorNote}>{error}</div>}

@@ -106,6 +106,22 @@
   border-top: 1px solid var(--border);
 }
 
+.kbdHint {
+  font-size: 11px;
+  color: var(--text-soft);
+  border: 1px solid var(--border-strong);
+  border-radius: 4px;
+  padding: 1px 5px;
+}
+
+.judgingNote {
+  padding: 12px 16px;
+  border-top: 1px solid var(--border);
+  color: var(--text-soft);
+  font-size: 13px;
+  background: var(--bg);
+}
+
 .authNote {
   padding: 12px 16px;
   background: var(--accent-soft);
