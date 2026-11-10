@@ -14,12 +14,17 @@ export function ProblemPage() {
   const [notFound, setNotFound] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    if (!slug) return
-    let active = true
+  const [lastSlug, setLastSlug] = useState(slug)
+  if (slug !== lastSlug) {
+    setLastSlug(slug)
     setLoading(true)
     setNotFound(false)
     setError(null)
+  }
+
+  useEffect(() => {
+    if (!slug) return
+    let active = true
     api
       .problem(slug)
       .then((p) => {

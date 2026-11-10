@@ -1,5 +1,5 @@
 import { Link, Outlet } from 'react-router'
-import { useAuth } from '../auth'
+import { useAuth } from '../use-auth'
 import styles from './Layout.module.css'
 
 export function Layout() {

@@ -1,6 +1,6 @@
 import { Navigate } from 'react-router'
 import { AuthForm } from '../components/AuthForm'
-import { useAuth } from '../auth'
+import { useAuth } from '../use-auth'
 
 export function LoginPage() {
   const { user, loading } = useAuth()

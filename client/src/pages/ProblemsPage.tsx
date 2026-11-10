@@ -46,9 +46,15 @@ export function ProblemsPage() {
     return p
   }, [page, category, difficulty, debouncedSearch])
 
+  const paramsKey = JSON.stringify(params)
+  const [lastParamsKey, setLastParamsKey] = useState(paramsKey)
+  if (paramsKey !== lastParamsKey) {
+    setLastParamsKey(paramsKey)
+    setLoading(true)
+  }
+
   useEffect(() => {
     let active = true
-    setLoading(true)
     api
       .problems(params)
       .then((r) => {
