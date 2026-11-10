@@ -1,8 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link } from 'react-router'
 import { api } from '../api'
 import type { CategorySummary, ProblemListResponse } from '@algoholic/shared'
-import { DifficultyBadge } from '../components/DifficultyBadge'
+import { ProblemTable } from '../components/ProblemTable'
 import styles from './ProblemsPage.module.css'
 
 const PAGE_SIZE = 20
@@ -121,38 +120,7 @@ export function ProblemsPage() {
         <div className={styles.message}>no problems match your filters</div>
       )}
 
-      {data && data.items.length > 0 && (
-        <div className={styles.tableWrap}>
-          <table className={styles.table}>
-            <thead>
-              <tr>
-                <th>status</th>
-                <th>title</th>
-                <th>category</th>
-                <th>difficulty</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.items.map((p) => (
-                <tr key={p.slug}>
-                  <td className={styles.status}>
-                    <span aria-hidden="true">·</span>
-                  </td>
-                  <td>
-                    <Link to={`/problems/${p.slug}`} className={styles.problemLink}>
-                      {p.title}
-                    </Link>
-                  </td>
-                  <td className={styles.category}>{p.category.name}</td>
-                  <td>
-                    <DifficultyBadge difficulty={p.difficulty} />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+      {data && data.items.length > 0 && <ProblemTable items={data.items} />}
 
       {data && data.total > data.pageSize && (
         <div className={styles.footer}>
