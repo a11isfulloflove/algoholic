@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import { z } from 'zod'
 import { prisma } from '../db'
-import { requireUser } from '../auth/middleware'
+import { attachUser, requireUser } from '../auth/middleware'
 import { judgeSubmission, type JudgeTest } from '../judge/judge'
 import { createRateLimiter } from '../rate-limit'
 import type {
@@ -14,9 +14,21 @@ import type {
 
 export const problemsRouter = Router()
 
-const submitBodySchema = z.object({
-  language: z.enum(['javascript', 'typescript']),
-  code: z.string().min(1).max(65536),
+const listQuerySchema = z.object({
+  category: z
+    .string()
+    .trim()
+    .min(1)
+    .optional(),
+  difficulty: z.enum(['easy', 'medium', 'hard']).optional(),
+  status: z.enum(['solved', 'unsolved']).optional(),
+  q: z
+    .string()
+    .trim()
+    .max(100)
+    .optional(),
+  page: z.coerce.number().int().min(1).default(1),
+  pageSize: z.coerce.number().int().min(1).max(50).default(20),
 })
 
 const LANGUAGE_TO_DB: Record<Language, 'JAVASCRIPT' | 'TYPESCRIPT'> = {
@@ -39,25 +51,14 @@ const judgeLimiter = createRateLimiter({
   key: (req) => String(req.user?.id ?? req.ip ?? 'anonymous'),
 })
 
-const listQuerySchema = z.object({
-  category: z
-    .string()
-    .trim()
-    .min(1)
-    .optional(),
-  difficulty: z.enum(['easy', 'medium', 'hard']).optional(),
-  q: z
-    .string()
-    .trim()
-    .max(100)
-    .optional(),
-  page: z.coerce.number().int().min(1).default(1),
-  pageSize: z.coerce.number().int().min(1).max(50).default(20),
+const submitBodySchema = z.object({
+  language: z.enum(['javascript', 'typescript']),
+  code: z.string().min(1).max(65536),
 })
 
 const DIFFICULTY_TO_DB = { easy: 'EASY', medium: 'MEDIUM', hard: 'HARD' } as const
 
-problemsRouter.get('/', async (req, res) => {
+problemsRouter.get('/', attachUser, async (req, res) => {
   const parsed = listQuerySchema.safeParse(req.query)
   if (!parsed.success) {
     return res.status(400).json({
@@ -69,7 +70,21 @@ problemsRouter.get('/', async (req, res) => {
     })
   }
 
-  const { category, difficulty, q, page, pageSize } = parsed.data
+  const { category, difficulty, status, q, page, pageSize } = parsed.data
+  const user = req.user
+
+  const solvedIds = user
+    ? new Set(
+        (
+          await prisma.submission.findMany({
+            where: { userId: user.id, status: 'ACCEPTED' },
+            select: { problemId: true },
+            distinct: ['problemId'],
+          })
+        ).map((s) => s.problemId),
+      )
+    : new Set<number>()
+
   const where = {
     isPublished: true,
     ...(category ? { category: { slug: category } } : {}),
@@ -82,6 +97,12 @@ problemsRouter.get('/', async (req, res) => {
           ],
         }
       : {}),
+    ...(user && status === 'solved'
+      ? { submissions: { some: { userId: user.id, status: 'ACCEPTED' as const } } }
+      : {}),
+    ...(user && status === 'unsolved'
+      ? { submissions: { none: { userId: user.id, status: 'ACCEPTED' as const } } }
+      : {}),
   }
 
   const [total, items] = await Promise.all([
@@ -92,6 +113,7 @@ problemsRouter.get('/', async (req, res) => {
       skip: (page - 1) * pageSize,
       take: pageSize,
       select: {
+        id: true,
         slug: true,
         title: true,
         difficulty: true,
@@ -105,6 +127,7 @@ problemsRouter.get('/', async (req, res) => {
       slug: p.slug,
       title: p.title,
       difficulty: p.difficulty.toLowerCase() as ProblemListResponse['items'][number]['difficulty'],
+      solved: solvedIds.has(p.id),
       category: p.category,
     })),
     total,
@@ -114,9 +137,9 @@ problemsRouter.get('/', async (req, res) => {
   res.json(body)
 })
 
-problemsRouter.get('/:slug', async (req, res) => {
+problemsRouter.get('/:slug', attachUser, async (req, res) => {
   const problem = await prisma.problem.findUnique({
-    where: { slug: req.params.slug },
+    where: { slug: String(req.params.slug) },
     include: {
       category: { select: { slug: true, name: true } },
       tests: {
@@ -131,13 +154,26 @@ problemsRouter.get('/:slug', async (req, res) => {
     return res.status(404).json({ error: 'problem not found' })
   }
 
-  const testCount = await prisma.testCase.count({ where: { problemId: problem.id } })
+  const [testCount, solved] = await Promise.all([
+    prisma.testCase.count({ where: { problemId: problem.id } }),
+    req.user
+      ? prisma.submission.findFirst({
+          where: {
+            userId: req.user.id,
+            problemId: problem.id,
+            status: 'ACCEPTED',
+          },
+          select: { id: true },
+        })
+      : null,
+  ])
 
   const body: ProblemDetail = {
     slug: problem.slug,
     title: problem.title,
     description: problem.description,
     difficulty: problem.difficulty.toLowerCase() as ProblemDetail['difficulty'],
+    solved: solved !== null,
     category: problem.category,
     functionName: problem.functionName,
     starterCodeJs: problem.starterCodeJs,
