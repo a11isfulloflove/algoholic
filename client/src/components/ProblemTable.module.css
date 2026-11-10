@@ -1,0 +1,73 @@
+.table {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.rowGrid {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr) 200px 130px;
+  column-gap: 12px;
+  align-items: center;
+  height: 48px;
+  padding: 0 16px;
+}
+
+.headerRow {
+  height: 36px;
+  background: #fdf5f9;
+  border-bottom: 1px solid var(--border);
+}
+
+.headerCell {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-soft);
+}
+
+.problemRow {
+  border-bottom: 1px solid var(--border);
+}
+
+.problemRow:last-child {
+  border-bottom: none;
+}
+
+.cell {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  height: 100%;
+}
+
+.statusDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--border-strong);
+}
+
+.titleLink {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.titleLink:hover {
+  color: var(--accent-text);
+  text-decoration: none;
+}
+
+.categoryText {
+  font-size: 14px;
+  color: var(--text-soft);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

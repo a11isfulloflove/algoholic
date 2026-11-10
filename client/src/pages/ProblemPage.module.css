@@ -1,0 +1,138 @@
+.header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.backLink {
+  font-size: 14px;
+  color: var(--text-soft);
+  display: inline-block;
+  margin-bottom: 12px;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px 32px;
+}
+
+.meta {
+  display: flex;
+  gap: 20px;
+  color: var(--text-soft);
+  font-size: 13px;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.markdown h3 {
+  font-size: 16px;
+  margin: 24px 0 8px;
+}
+
+.markdown p {
+  margin-bottom: 12px;
+}
+
+.markdown ul,
+.markdown ol {
+  margin: 0 0 12px 22px;
+}
+
+.markdown li {
+  margin-bottom: 4px;
+}
+
+.markdown strong {
+  font-weight: 600;
+}
+
+.markdown code {
+  font-family: var(--mono);
+  font-size: 13px;
+  background: var(--accent-soft);
+  color: var(--accent-text);
+  border-radius: 4px;
+  padding: 1px 5px;
+}
+
+.samples {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 8px;
+}
+
+.samples th {
+  text-align: left;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-soft);
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.samples td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  font-family: var(--mono);
+  font-size: 13px;
+}
+
+.samples tr:last-child td {
+  border-bottom: none;
+}
+
+.editorNote {
+  margin-top: 28px;
+  background: var(--accent-soft);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+}
+
+.editorNoteTitle {
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: var(--accent-text);
+}
+
+.editorNote p {
+  font-size: 14px;
+  color: var(--text);
+  margin-bottom: 12px;
+}
+
+.starter {
+  font-family: var(--mono);
+  font-size: 13px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 16px;
+  overflow-x: auto;
+  white-space: pre;
+  line-height: 1.5;
+}
+
+.message {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 48px;
+  text-align: center;
+  color: var(--text-soft);
+}

@@ -1,14 +1,62 @@
 :root {
-  color-scheme: light dark;
+  --bg: #fafaf7;
+  --surface: #ffffff;
+  --text: #2b2e36;
+  --text-soft: #71757f;
+  --border: #e8e7e3;
+  --border-strong: #d9d8d2;
+
+  --accent: #e383a9;
+  --accent-hover: #d76e99;
+  --accent-soft: #fceef4;
+  --accent-text: #b3537f;
+
+  --easy: #23834d;
+  --easy-bg: #e0f5e8;
+  --medium: #a4740d;
+  --medium-bg: #fdf0d3;
+  --hard: #bb4a44;
+  --hard-bg: #fde3e1;
+
+  --danger: #bb4a44;
+  --danger-bg: #fde3e1;
+
+  --mono: ui-monospace, 'SF Mono', Consolas, monospace;
+  --radius: 10px;
+
+  color-scheme: light;
 }
 
 * {
   margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 body {
-  min-height: 100vh;
-  display: grid;
-  place-items: center;
   font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--accent-text);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+}
+
+input,
+select {
+  font: inherit;
+  color: inherit;
 }
