@@ -5,6 +5,7 @@ import remarkGfm from 'remark-gfm'
 import { api, ApiError } from '../api'
 import type { ProblemDetail } from '@algoholic/shared'
 import { DifficultyBadge } from '../components/DifficultyBadge'
+import { EditorPanel } from '../components/EditorPanel'
 import styles from './ProblemPage.module.css'
 
 export function ProblemPage() {
@@ -76,46 +77,49 @@ export function ProblemPage() {
         </span>
       </div>
 
-      <div className={styles.card}>
-        <div className={styles.meta}>
-          <span>⏱ {problem.timeLimitMs / 1000}s time limit</span>
-          <span>🧠 {problem.memoryLimitMb} MB memory</span>
-          <span>🧪 {problem.testCount} tests</span>
-          <span>🎯 js / ts</span>
-        </div>
+      <div className={styles.layout}>
+        <section className={styles.statement}>
+          <div className={styles.card}>
+            <div className={styles.meta}>
+              <span>⏱ {problem.timeLimitMs / 1000}s time limit</span>
+              <span>🧠 {problem.memoryLimitMb} MB memory</span>
+              <span>🧪 {problem.testCount} tests</span>
+              <span>🎯 js / ts</span>
+            </div>
 
-        <div className={styles.markdown}>
-          <Markdown remarkPlugins={[remarkGfm]}>{problem.description}</Markdown>
-        </div>
+            <div className={styles.markdown}>
+              <Markdown remarkPlugins={[remarkGfm]}>{problem.description}</Markdown>
+            </div>
 
-        <h3 className={styles.markdown}>samples</h3>
-        <table className={styles.samples}>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>input (args)</th>
-              <th>expected</th>
-            </tr>
-          </thead>
-          <tbody>
-            {problem.samples.map((s, i) => (
-              <tr key={i}>
-                <td>{i + 1}</td>
-                <td>{s.args.map((a) => JSON.stringify(a)).join(', ')}</td>
-                <td>{JSON.stringify(s.expected)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+            <h3 className={styles.markdown}>samples</h3>
+            <table className={styles.samples}>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>input (args)</th>
+                  <th>expected</th>
+                </tr>
+              </thead>
+              <tbody>
+                {problem.samples.map((s, i) => (
+                  <tr key={i}>
+                    <td>{i + 1}</td>
+                    <td>{s.args.map((a) => JSON.stringify(a)).join(', ')}</td>
+                    <td>{JSON.stringify(s.expected)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
 
-        <div className={styles.editorNote}>
-          <div className={styles.editorNoteTitle}>✨ the code editor lands in the next phase</div>
-          <p>
-            for now, solve it your way — here is the starter code the editor will open with
-            (javascript):
-          </p>
-          <pre className={styles.starter}>{problem.starterCodeJs}</pre>
-        </div>
+        <section className={styles.editorSide}>
+          <EditorPanel
+            slug={problem.slug}
+            starterCodeJs={problem.starterCodeJs}
+            starterCodeTs={problem.starterCodeTs}
+          />
+        </section>
       </div>
     </div>
   )

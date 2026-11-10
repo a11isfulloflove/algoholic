@@ -1,0 +1,101 @@
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  background: #fdf5f9;
+  flex-wrap: wrap;
+}
+
+.segmented {
+  display: inline-flex;
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.segment {
+  border: none;
+  background: var(--surface);
+  color: var(--text-soft);
+  padding: 5px 14px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.segment + .segment {
+  border-left: 1px solid var(--border-strong);
+}
+
+.segmentActive {
+  background: var(--accent-soft);
+  color: var(--accent-text);
+}
+
+.spacer {
+  flex: 1;
+}
+
+.actionButton {
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--text-soft);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.actionButton:hover {
+  color: var(--text);
+  border-color: var(--text-soft);
+}
+
+.runButton {
+  border: none;
+  background: var(--accent);
+  color: #fff;
+  padding: 6px 18px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.runButton:hover {
+  background: var(--accent-hover);
+}
+
+.editor :global(.cm-editor) {
+  font-size: 13.5px;
+}
+
+.editor :global(.cm-editor .cm-scroller) {
+  font-family: var(--mono);
+  line-height: 1.6;
+}
+
+.editor :global(.cm-editor.cm-focused) {
+  outline: none;
+}
+
+.editor :global(.cm-gutters) {
+  background: var(--bg);
+  border-right: 1px solid var(--border);
+  color: #b8b6bd;
+}
+
+.authNote {
+  padding: 12px 16px;
+  background: var(--accent-soft);
+  color: var(--accent-text);
+  font-size: 14px;
+  border-top: 1px solid var(--border);
+}
