@@ -2,6 +2,7 @@ import type {
   CategorySummary,
   ProblemDetail,
   ProblemListResponse,
+  ProblemSolution,
   RunSamplesResponse,
   StatsResponse,
   SubmissionDetail,
@@ -73,6 +74,7 @@ export const api = {
     return request<ProblemListResponse>(`/api/problems${qs ? `?${qs}` : ''}`)
   },
   problem: (slug: string) => request<ProblemDetail>(`/api/problems/${slug}`),
+  solution: (slug: string) => request<ProblemSolution>(`/api/problems/${slug}/solution`),
   run: (slug: string, body: { language: string; code: string }) =>
     request<RunSamplesResponse>(`/api/problems/${slug}/run`, {
       method: 'POST',
