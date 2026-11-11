@@ -44,6 +44,13 @@ export interface SampleTestCase {
   expected: unknown
 }
 
+export interface RelatedProblemCard {
+  slug: string
+  title: string
+  difficulty: Difficulty
+  solved: boolean
+}
+
 export interface ProblemDetail {
   slug: string
   title: string
@@ -59,8 +66,17 @@ export interface ProblemDetail {
   starterCodeTs: string
   timeLimitMs: number
   memoryLimitMb: number
+  targetComplexity: string | null
+  hintsCount: number
+  hints: string[] | null
+  related: RelatedProblemCard[]
   samples: SampleTestCase[]
   testCount: number
+}
+
+export interface ProblemSolution {
+  solutionJs: string
+  solutionNotes: string | null
 }
 
 export const LANGUAGES = ['javascript', 'typescript'] as const

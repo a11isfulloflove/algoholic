@@ -8,6 +8,8 @@ import type {
   Language,
   ProblemDetail,
   ProblemListResponse,
+  ProblemSolution,
+  RelatedProblemCard,
   RunSamplesResponse,
   SubmitResponse,
 } from '@algoholic/shared'
@@ -154,19 +156,50 @@ problemsRouter.get('/:slug', attachUser, async (req, res) => {
     return res.status(404).json({ error: 'problem not found' })
   }
 
-  const [testCount, solved] = await Promise.all([
+  const user = req.user
+  const hints = Array.isArray(problem.hints) ? (problem.hints as string[]) : null
+  const relatedSlugs = Array.isArray(problem.relatedSlugs)
+    ? (problem.relatedSlugs as string[])
+    : []
+
+  const [testCount, solved, relatedRows, solvedRelatedRows] = await Promise.all([
     prisma.testCase.count({ where: { problemId: problem.id } }),
-    req.user
+    user
       ? prisma.submission.findFirst({
-          where: {
-            userId: req.user.id,
-            problemId: problem.id,
-            status: 'ACCEPTED',
-          },
+          where: { userId: user.id, problemId: problem.id, status: 'ACCEPTED' },
           select: { id: true },
         })
       : null,
+    relatedSlugs.length > 0
+      ? prisma.problem.findMany({
+          where: { slug: { in: relatedSlugs }, isPublished: true },
+          select: { slug: true, title: true, difficulty: true },
+        })
+      : [],
+    user && relatedSlugs.length > 0
+      ? prisma.submission.findMany({
+          where: {
+            userId: user.id,
+            status: 'ACCEPTED',
+            problem: { slug: { in: relatedSlugs } },
+          },
+          select: { problem: { select: { slug: true } } },
+          distinct: ['problemId'],
+        })
+      : [],
   ])
+
+  const solvedRelatedSlugs = new Set(
+    solvedRelatedRows.map((r) => (r.problem as { slug: string }).slug),
+  )
+  const related: RelatedProblemCard[] = relatedRows
+    .map((r) => ({
+      slug: r.slug,
+      title: r.title,
+      difficulty: r.difficulty.toLowerCase() as RelatedProblemCard['difficulty'],
+      solved: solvedRelatedSlugs.has(r.slug),
+    }))
+    .sort((a, b) => relatedSlugs.indexOf(a.slug) - relatedSlugs.indexOf(b.slug))
 
   const body: ProblemDetail = {
     slug: problem.slug,
@@ -180,11 +213,44 @@ problemsRouter.get('/:slug', attachUser, async (req, res) => {
     starterCodeTs: problem.starterCodeTs,
     timeLimitMs: problem.timeLimitMs,
     memoryLimitMb: problem.memoryLimitMb,
+    targetComplexity: problem.targetComplexity,
+    hintsCount: hints ? hints.length : 0,
+    hints: user && hints ? hints : null,
+    related,
     samples: problem.tests.map((t) => ({
       args: t.args as unknown[],
       expected: t.expected,
     })),
     testCount,
+  }
+  res.json(body)
+})
+
+problemsRouter.get('/:slug/solution', requireUser, async (req, res) => {
+  const user = req.user
+  if (!user) {
+    return res.status(401).json({ error: 'authentication required' })
+  }
+
+  const problem = await prisma.problem.findUnique({
+    where: { slug: String(req.params.slug) },
+    select: { id: true, isPublished: true, solutionJs: true, solutionNotes: true },
+  })
+  if (!problem || !problem.isPublished || !problem.solutionJs) {
+    return res.status(404).json({ error: 'no reference solution available' })
+  }
+
+  const accepted = await prisma.submission.findFirst({
+    where: { userId: user.id, problemId: problem.id, status: 'ACCEPTED' },
+    select: { id: true },
+  })
+  if (!accepted) {
+    return res.status(403).json({ error: 'solve this problem first to unlock the solution' })
+  }
+
+  const body: ProblemSolution = {
+    solutionJs: problem.solutionJs,
+    solutionNotes: problem.solutionNotes,
   }
   res.json(body)
 })
