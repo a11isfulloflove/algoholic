@@ -47,23 +47,28 @@ model Category {
 }
 
 model Problem {
-  id            Int          @id @default(autoincrement())
-  slug          String       @unique
-  title         String
-  description   String
-  difficulty    Difficulty
-  categoryId    Int
-  category      Category     @relation(fields: [categoryId], references: [id])
-  functionName  String
-  starterCodeJs String
-  starterCodeTs String
-  timeLimitMs   Int          @default(3000)
-  memoryLimitMb Int          @default(256)
-  isPublished   Boolean      @default(true)
-  tests         TestCase[]
-  submissions   Submission[]
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
+  id               Int        @id @default(autoincrement())
+  slug             String     @unique
+  title            String
+  description      String
+  difficulty       Difficulty
+  categoryId       Int
+  category         Category   @relation(fields: [categoryId], references: [id])
+  functionName     String
+  starterCodeJs    String
+  starterCodeTs    String
+  timeLimitMs      Int        @default(3000)
+  memoryLimitMb    Int        @default(256)
+  isPublished      Boolean    @default(true)
+  targetComplexity String?
+  hints            Json?
+  solutionJs       String?
+  solutionNotes    String?
+  relatedSlugs     Json?
+  tests            TestCase[]
+  submissions      Submission[]
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
 
   @@index([categoryId, difficulty])
 }

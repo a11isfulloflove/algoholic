@@ -27,6 +27,146 @@
 }
 
 @media (max-width: 1100px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.softText {
+  color: var(--text-soft);
+  font-size: 14px;
+}
+
+.hintsBlock {
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px dashed var(--border-strong);
+}
+
+.sectionTitle {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0 0 10px;
+  letter-spacing: 0;
+}
+
+.hintCard {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  background: var(--accent-soft);
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.hintNumber {
+  font-weight: 700;
+  color: var(--accent-text);
+  flex-shrink: 0;
+}
+
+.revealButton {
+  margin-top: 8px;
+  border: none;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 8px;
+  padding: 6px 18px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.revealButton:hover {
+  background: var(--accent-hover);
+}
+
+.tryNextBlock {
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px dashed var(--border-strong);
+}
+
+.tryNextList {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.tryNextRow {
+  display: block;
+  width: 100%;
+  padding: 9px 14px;
+  color: var(--text);
+}
+
+.tryNextRow + .tryNextRow {
+  border-top: 1px solid var(--border);
+}
+
+.tryNextRow:hover {
+  background: var(--accent-soft);
+  text-decoration: none;
+}
+
+.tryNextInner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.tryNextTitle {
+  font-size: 14px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.tryNextCheck {
+  color: var(--easy);
+  font-weight: 700;
+}
+
+.solutionCard {
+  margin-top: 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 22px;
+}
+
+.solutionToggle {
+  border: 1px solid var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent-text);
+  border-radius: 999px;
+  padding: 8px 18px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.solutionToggle:hover {
+  background: var(--accent);
+  color: #fff;
+}
+
+.solutionNotes {
+  margin-top: 16px;
+  padding: 14px 16px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.solutionCard .starter {
+  margin-top: 16px;
+}
+
 .solvedBadge {
   display: inline-block;
   padding: 2px 10px;
@@ -35,11 +175,6 @@
   color: var(--easy);
   font-size: 12px;
   font-weight: 700;
-}
-
-.layout {
-    grid-template-columns: 1fr;
-  }
 }
 
 .statement {
@@ -71,7 +206,6 @@
 }
 
 .markdown h3 {
-  font-size: 16px;
   margin: 24px 0 8px;
 }
 
