@@ -31,8 +31,10 @@ enum SubmissionStatus {
 
 model User {
   id           Int          @id @default(autoincrement())
-  email        String       @unique
+  username     String       @unique
   passwordHash String
+  name         String?
+  avatar       String?
   createdAt    DateTime     @default(now())
   submissions  Submission[]
 }

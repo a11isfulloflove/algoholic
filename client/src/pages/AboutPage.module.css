@@ -1,0 +1,39 @@
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px 36px;
+  max-width: 720px;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 12px;
+}
+
+.text {
+  color: var(--text);
+  margin-bottom: 12px;
+}
+
+.sectionTitle {
+  font-size: 15px;
+  font-weight: 700;
+  margin: 22px 0 8px;
+}
+
+.list {
+  margin: 0 0 12px 22px;
+  color: var(--text);
+}
+
+.list li {
+  margin-bottom: 6px;
+}
+
+.soft {
+  color: var(--text-soft);
+  font-size: 14px;
+}

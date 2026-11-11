@@ -3,7 +3,11 @@ import type {
   ProblemDetail,
   ProblemListResponse,
   RunSamplesResponse,
+  StatsResponse,
+  SubmissionDetail,
+  SubmissionListResponse,
   SubmitResponse,
+  UserPublic,
 } from '@algoholic/shared'
 
 export class ApiError extends Error {
@@ -33,24 +37,36 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
   return (await res.json()) as T
 }
 
-export interface AuthUser {
-  id: number
-  email: string
-}
+export type AuthUser = UserPublic
 
 export const api = {
   me: () => request<{ user: AuthUser }>('/api/auth/me'),
-  login: (email: string, password: string) =>
+  login: (username: string, password: string) =>
     request<{ user: AuthUser }>('/api/auth/login', {
       method: 'POST',
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ username, password }),
     }),
-  register: (email: string, password: string) =>
+  register: (username: string, password: string, name?: string, avatar?: string) =>
     request<{ user: AuthUser }>('/api/auth/register', {
       method: 'POST',
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ username, password, name, avatar }),
     }),
   logout: () => request<{ ok: boolean }>('/api/auth/logout', { method: 'POST' }),
+  updateProfile: (body: { name?: string; avatar?: string }) =>
+    request<{ user: AuthUser }>('/api/auth/me', {
+      method: 'PATCH',
+      body: JSON.stringify(body),
+    }),
+  changePassword: (currentPassword: string, newPassword: string) =>
+    request<{ ok: boolean }>('/api/auth/change-password', {
+      method: 'POST',
+      body: JSON.stringify({ currentPassword, newPassword }),
+    }),
+  changeUsername: (currentPassword: string, newUsername: string) =>
+    request<{ user: AuthUser }>('/api/auth/change-username', {
+      method: 'POST',
+      body: JSON.stringify({ currentPassword, newUsername }),
+    }),
   categories: () => request<CategorySummary[]>('/api/categories'),
   problems: (params: Record<string, string>) => {
     const qs = new URLSearchParams(params).toString()
@@ -67,4 +83,10 @@ export const api = {
       method: 'POST',
       body: JSON.stringify(body),
     }),
+  submissions: (params: Record<string, string>) => {
+    const qs = new URLSearchParams(params).toString()
+    return request<SubmissionListResponse>(`/api/submissions${qs ? `?${qs}` : ''}`)
+  },
+  submission: (id: number) => request<SubmissionDetail>(`/api/submissions/${id}`),
+  stats: () => request<StatsResponse>('/api/stats'),
 }

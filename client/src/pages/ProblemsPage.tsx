@@ -1,12 +1,15 @@
 import { useEffect, useMemo, useState } from 'react'
 import { api } from '../api'
 import type { CategorySummary, ProblemListResponse } from '@algoholic/shared'
+import { Dropdown } from '../components/Dropdown'
 import { ProblemTable } from '../components/ProblemTable'
+import { useAuth } from '../use-auth'
 import styles from './ProblemsPage.module.css'
 
 const PAGE_SIZE = 20
 
 export function ProblemsPage() {
+  const { user } = useAuth()
   const [categories, setCategories] = useState<CategorySummary[]>([])
   const [data, setData] = useState<ProblemListResponse | null>(null)
   const [loading, setLoading] = useState(true)
@@ -14,6 +17,7 @@ export function ProblemsPage() {
 
   const [category, setCategory] = useState('')
   const [difficulty, setDifficulty] = useState('')
+  const [status, setStatus] = useState('')
   const [search, setSearch] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')
   const [page, setPage] = useState(1)
@@ -30,7 +34,7 @@ export function ProblemsPage() {
     return () => clearTimeout(t)
   }, [search])
 
-  const filterKey = `${category}|${difficulty}|${debouncedSearch}`
+  const filterKey = `${category}|${difficulty}|${status}|${debouncedSearch}`
   const [lastFilterKey, setLastFilterKey] = useState(filterKey)
   if (filterKey !== lastFilterKey) {
     setLastFilterKey(filterKey)
@@ -41,9 +45,10 @@ export function ProblemsPage() {
     const p: Record<string, string> = { page: String(page), pageSize: String(PAGE_SIZE) }
     if (category) p.category = category
     if (difficulty) p.difficulty = difficulty
+    if (status) p.status = status
     if (debouncedSearch) p.q = debouncedSearch
     return p
-  }, [page, category, difficulty, debouncedSearch])
+  }, [page, category, difficulty, status, debouncedSearch])
 
   const paramsKey = JSON.stringify(params)
   const [lastParamsKey, setLastParamsKey] = useState(paramsKey)
@@ -90,28 +95,36 @@ export function ProblemsPage() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-        <select
-          className={styles.select}
+        <Dropdown
           value={category}
-          onChange={(e) => setCategory(e.target.value)}
-        >
-          <option value="">all categories</option>
-          {categories.map((c) => (
-            <option key={c.slug} value={c.slug}>
-              {c.name} ({c.problemCount})
-            </option>
-          ))}
-        </select>
-        <select
-          className={styles.select}
+          onChange={setCategory}
+          placeholder="all categories"
+          options={categories.map((c) => ({
+            value: c.slug,
+            label: `${c.name} (${c.problemCount})`,
+          }))}
+        />
+        <Dropdown
           value={difficulty}
-          onChange={(e) => setDifficulty(e.target.value)}
-        >
-          <option value="">all difficulties</option>
-          <option value="easy">easy</option>
-          <option value="medium">medium</option>
-          <option value="hard">hard</option>
-        </select>
+          onChange={setDifficulty}
+          placeholder="all difficulties"
+          options={[
+            { value: 'easy', label: 'easy' },
+            { value: 'medium', label: 'medium' },
+            { value: 'hard', label: 'hard' },
+          ]}
+        />
+        {user && (
+          <Dropdown
+            value={status}
+            onChange={setStatus}
+            placeholder="all"
+            options={[
+              { value: 'solved', label: 'solved' },
+              { value: 'unsolved', label: 'unsolved' },
+            ]}
+          />
+        )}
       </div>
 
       {error && <div className={styles.message}>{error}</div>}

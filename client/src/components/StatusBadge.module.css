@@ -1,0 +1,28 @@
+.badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.accepted {
+  background: var(--easy-bg);
+  color: var(--easy);
+}
+
+.wrong {
+  background: var(--hard-bg);
+  color: var(--hard);
+}
+
+.warn {
+  background: var(--medium-bg);
+  color: var(--medium);
+}
+
+.neutral {
+  background: var(--accent-soft);
+  color: var(--accent-text);
+}

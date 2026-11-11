@@ -16,7 +16,7 @@
 
 .headerRow {
   height: 36px;
-  background: #fdf5f9;
+  background: var(--accent-faint);
   border-bottom: 1px solid var(--border);
 }
 
@@ -44,10 +44,23 @@
 }
 
 .statusDot {
-  width: 8px;
-  height: 8px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   background: var(--border-strong);
+}
+
+.solvedMark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--easy-bg);
+  color: var(--easy);
+  font-size: 13px;
+  font-weight: 700;
 }
 
 .titleLink {

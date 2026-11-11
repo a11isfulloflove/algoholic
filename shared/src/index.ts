@@ -25,6 +25,7 @@ export interface ProblemListItem {
   slug: string
   title: string
   difficulty: Difficulty
+  solved: boolean
   category: {
     slug: string
     name: string
@@ -48,6 +49,7 @@ export interface ProblemDetail {
   title: string
   description: string
   difficulty: Difficulty
+  solved: boolean
   category: {
     slug: string
     name: string
@@ -63,6 +65,101 @@ export interface ProblemDetail {
 
 export const LANGUAGES = ['javascript', 'typescript'] as const
 export type Language = (typeof LANGUAGES)[number]
+
+export const AVATARS = [
+  '🦊',
+  '🐼',
+  '🐸',
+  '🐙',
+  '🦄',
+  '🐱',
+  '🐶',
+  '🐨',
+  '🐯',
+  '🦁',
+  '🐮',
+  '🐷',
+  '🐰',
+  '🐵',
+  '🦉',
+  '🐢',
+  '🦋',
+  '🐳',
+  '🦕',
+  '🐿️',
+  '🦔',
+  '🐺',
+  '👾',
+  '🤖',
+  '👻',
+  '🦜',
+  '🔮',
+  '🐧',
+  '🐝',
+  '🐞',
+  '🦈',
+  '🦩',
+  '🐠',
+  '🦭',
+  '🦥',
+  '🦖',
+  '🎃',
+  '🧙',
+  '🧚',
+  '🥷',
+  '👽',
+  '🍄',
+  '🌸',
+  '🌈',
+  '⭐',
+  '🌙',
+  '🌚',
+  '🌝',
+  '🔥',
+  '🍓',
+  '🍒',
+  '🍑',
+  '🍍',
+  '🥑',
+  '🍉',
+  '⛄',
+] as const
+export type Avatar = (typeof AVATARS)[number]
+
+export interface UserPublic {
+  id: number
+  username: string
+  name: string | null
+  avatar: string | null
+  createdAt: string
+}
+
+export interface DifficultyProgress {
+  solved: number
+  total: number
+}
+
+export interface CategoryProgress {
+  slug: string
+  name: string
+  solved: number
+  total: number
+}
+
+export interface FavoriteLanguage {
+  language: Language
+  share: number
+}
+
+export interface StatsResponse {
+  solvedTotal: number
+  problemsTotal: number
+  submissions: number
+  accepted: number
+  byDifficulty: Record<Difficulty, DifficultyProgress>
+  byCategory: CategoryProgress[]
+  favoriteLanguage: FavoriteLanguage | null
+}
 
 export interface TestCaseResult {
   index: number

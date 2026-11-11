@@ -7,7 +7,13 @@ export function ProblemRow({ problem }: { problem: ProblemListItem }) {
   return (
     <div className={`${styles.rowGrid} ${styles.problemRow}`}>
       <div className={styles.cell}>
-        <span className={styles.statusDot} aria-hidden="true" />
+        {problem.solved ? (
+          <span className={styles.solvedMark} title="solved">
+            ✓
+          </span>
+        ) : (
+          <span className={styles.statusDot} aria-hidden="true" />
+        )}
       </div>
       <div className={styles.cell}>
         <Link to={`/problems/${problem.slug}`} className={styles.titleLink}>

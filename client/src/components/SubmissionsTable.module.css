@@ -1,0 +1,70 @@
+.table {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.rowGrid {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr) 110px 90px 180px;
+  column-gap: 12px;
+  align-items: center;
+  height: 48px;
+  padding: 0 16px;
+}
+
+.headerRow {
+  height: 36px;
+  background: #fdf5f9;
+  border-bottom: 1px solid var(--border);
+}
+
+.headerCell {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-soft);
+}
+
+.submissionRow {
+  border-bottom: 1px solid var(--border);
+  color: inherit;
+}
+
+.submissionRow:last-child {
+  border-bottom: none;
+}
+
+.submissionRow:hover {
+  background: var(--accent-soft);
+}
+
+.cell {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  height: 100%;
+}
+
+.problemLink {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mono {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--text-soft);
+}
+
+.date {
+  font-size: 13px;
+  color: var(--text-soft);
+  white-space: nowrap;
+}
