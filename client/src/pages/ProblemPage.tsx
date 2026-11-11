@@ -8,8 +8,9 @@ import { DifficultyBadge } from '../components/DifficultyBadge'
 import { EditorPanel } from '../components/EditorPanel'
 import styles from './ProblemPage.module.css'
 
-export function ProblemPage() {
-  const { slug } = useParams<{ slug: string }>()
+export function ProblemPage({ slug: slugProp }: { slug?: string } = {}) {
+  const params = useParams<{ slug: string }>()
+  const slug = slugProp ?? params.slug
   const [problem, setProblem] = useState<ProblemDetail | null>(null)
   const [solved, setSolved] = useState(false)
   const [loading, setLoading] = useState(true)
