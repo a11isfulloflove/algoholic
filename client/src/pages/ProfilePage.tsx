@@ -1,16 +1,11 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router'
-import { AVATARS, type Difficulty, type StatsResponse, type SubmissionListResponse } from '@algoholic/shared'
+import { AVATARS, type StatsResponse, type SubmissionListResponse } from '@algoholic/shared'
 import { api } from '../api'
 import { useAuth } from '../use-auth'
+import { PasswordInput } from '../components/PasswordInput'
 import { SubmissionsTable } from '../components/SubmissionsTable'
 import styles from './ProfilePage.module.css'
-
-const DIFFICULTY_FILL: Record<Difficulty, string> = {
-  easy: styles.fillEasy,
-  medium: styles.fillMedium,
-  hard: styles.fillHard,
-}
 
 export function ProfilePage() {
   const { user, loading, updateUser } = useAuth()
@@ -23,6 +18,19 @@ export function ProfilePage() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  const [currentPassword, setCurrentPassword] = useState('')
+  const [newPassword, setNewPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [pwBusy, setPwBusy] = useState(false)
+  const [pwError, setPwError] = useState<string | null>(null)
+  const [pwSuccess, setPwSuccess] = useState(false)
+
+  const [newUsername, setNewUsername] = useState('')
+  const [usernamePassword, setUsernamePassword] = useState('')
+  const [unBusy, setUnBusy] = useState(false)
+  const [unError, setUnError] = useState<string | null>(null)
+  const [unSuccess, setUnSuccess] = useState(false)
+
   useEffect(() => {
     if (!user) return
     let active = true
@@ -34,7 +42,10 @@ export function ProfilePage() {
         }
       })
       .catch(() => {
-        if (active) setStats(null)
+        if (active) {
+          setStats(null)
+          setRecent(null)
+        }
       })
     return () => {
       active = false
@@ -73,7 +84,41 @@ export function ProfilePage() {
     }
   }
 
-  const displayName = user?.name ?? user?.email.split('@')[0] ?? ''
+  async function changeUsername() {
+    setUnBusy(true)
+    setUnError(null)
+    setUnSuccess(false)
+    try {
+      const r = await api.changeUsername(usernamePassword, newUsername.trim().toLowerCase())
+      updateUser(r.user)
+      setNewUsername('')
+      setUsernamePassword('')
+      setUnSuccess(true)
+    } catch (err) {
+      setUnError(err instanceof Error ? err.message : 'could not update username')
+    } finally {
+      setUnBusy(false)
+    }
+  }
+
+  async function changePassword() {
+    setPwBusy(true)
+    setPwError(null)
+    setPwSuccess(false)
+    try {
+      await api.changePassword(currentPassword, newPassword)
+      setCurrentPassword('')
+      setNewPassword('')
+      setConfirmPassword('')
+      setPwSuccess(true)
+    } catch (err) {
+      setPwError(err instanceof Error ? err.message : 'could not update password')
+    } finally {
+      setPwBusy(false)
+    }
+  }
+
+  const displayName = user?.name ?? user?.username ?? ''
 
   return (
     <div>
@@ -84,7 +129,7 @@ export function ProfilePage() {
             <div className={styles.name}>{displayName}</div>
             {user && (
               <div className={styles.subline}>
-                {user.email} · solving since{' '}
+                @{user.username} · solving since{' '}
                 {new Date(user.createdAt).toLocaleDateString(undefined, {
                   year: 'numeric',
                   month: 'long',
@@ -103,37 +148,157 @@ export function ProfilePage() {
         {editing && (
           <div className={styles.editForm}>
             {error && <div className={styles.subline}>{error}</div>}
-            <div className={styles.field}>
-              <label htmlFor="profileName" className={styles.label}>
-                name
-              </label>
-              <input
-                id="profileName"
-                type="text"
-                className={styles.input}
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                maxLength={30}
-                placeholder="how should we call you?"
-              />
+            <div className={styles.editColumns}>
+              <div className={styles.identityColumn}>
+                <div className={styles.field}>
+                  <label htmlFor="profileName" className={styles.label}>
+                    name
+                  </label>
+                  <input
+                    id="profileName"
+                    type="text"
+                    className={styles.input}
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    maxLength={30}
+                    placeholder="how should we call you?"
+                  />
+                </div>
+                <div className={styles.field}>
+                  <span className={styles.label}>avatar</span>
+                  <div className={styles.avatarGrid}>
+                    {AVATARS.map((a) => (
+                      <button
+                        key={a}
+                        type="button"
+                        className={`${styles.avatarButton} ${avatar === a ? styles.avatarActive : ''}`}
+                        onClick={() => setAvatar(avatar === a ? null : a)}
+                        aria-pressed={avatar === a}
+                        aria-label={`avatar ${a}`}
+                      >
+                        {a}
+                      </button>
+                     ))}
+                   </div>
+                 </div>
+               </div>
+              <div className={styles.securityColumn}>
+              <div className={styles.pwSection}>
+                <div className={styles.pwSectionTitle}>✏️ change username</div>
+              {unSuccess && (
+                <div className={styles.pwSuccess}>username updated ✓ log in with it next time</div>
+              )}
+              {unError && <div className={styles.pwError}>{unError}</div>}
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault()
+                  if (!newUsername.trim()) {
+                    setUnError('enter a new username')
+                    setUnSuccess(false)
+                    return
+                  }
+                  void changeUsername()
+                }}
+              >
+                <div className={styles.field}>
+                  <label htmlFor="newUsername" className={styles.label}>
+                    new username
+                  </label>
+                  <input
+                    id="newUsername"
+                    type="text"
+                    className={styles.input}
+                    value={newUsername}
+                    onChange={(e) => setNewUsername(e.target.value)}
+                    placeholder="lowercase letters, numbers, _"
+                    minLength={3}
+                    maxLength={24}
+                    pattern="[a-zA-Z0-9_]+"
+                    title="only letters, numbers and underscores"
+                    required
+                  />
+                </div>
+                <div className={styles.field}>
+                  <label htmlFor="usernamePassword" className={styles.label}>
+                    current password
+                  </label>
+                  <PasswordInput
+                    id="usernamePassword"
+                    value={usernamePassword}
+                    onChange={setUsernamePassword}
+                    autoComplete="current-password"
+                    required
+                  />
+                </div>
+                <button type="submit" className={styles.updateButton} disabled={unBusy}>
+                  {unBusy ? 'updating…' : 'update username'}
+                </button>
+              </form>
             </div>
-            <div className={styles.field}>
-              <span className={styles.label}>avatar</span>
-              <div className={styles.avatarGrid}>
-                {AVATARS.map((a) => (
-                  <button
-                    key={a}
-                    type="button"
-                    className={`${styles.avatarButton} ${avatar === a ? styles.avatarActive : ''}`}
-                    onClick={() => setAvatar(avatar === a ? null : a)}
-                    aria-pressed={avatar === a}
-                    aria-label={`avatar ${a}`}
-                  >
-                    {a}
-                  </button>
-                ))}
+
+            <div className={styles.pwSection}>
+              <div className={styles.pwSectionTitle}>🔐 change password</div>
+              {pwSuccess && (
+                <div className={styles.pwSuccess}>password updated ✓ use it next time you log in</div>
+              )}
+              {pwError && <div className={styles.pwError}>{pwError}</div>}
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault()
+                  if (newPassword !== confirmPassword) {
+                    setPwError('new passwords do not match')
+                    setPwSuccess(false)
+                    return
+                  }
+                  void changePassword()
+                }}
+              >
+                <div className={styles.field}>
+                  <label htmlFor="currentPassword" className={styles.label}>
+                    current password
+                  </label>
+                  <PasswordInput
+                    id="currentPassword"
+                    value={currentPassword}
+                    onChange={setCurrentPassword}
+                    autoComplete="current-password"
+                    required
+                  />
+                </div>
+                <div className={styles.field}>
+                  <label htmlFor="newPassword" className={styles.label}>
+                    new password
+                  </label>
+                  <PasswordInput
+                    id="newPassword"
+                    value={newPassword}
+                    onChange={setNewPassword}
+                    autoComplete="new-password"
+                    minLength={8}
+                    required
+                  />
+                </div>
+                <div className={styles.field}>
+                  <label htmlFor="confirmPassword" className={styles.label}>
+                    confirm new password
+                  </label>
+                  <PasswordInput
+                    id="confirmPassword"
+                    value={confirmPassword}
+                    onChange={setConfirmPassword}
+                    autoComplete="new-password"
+                    minLength={8}
+                    required
+                  />
+                </div>
+                <button type="submit" className={styles.updateButton} disabled={pwBusy}>
+                  {pwBusy ? 'updating…' : 'update password'}
+                </button>
+              </form>
+              </div>
               </div>
             </div>
+
             <div className={styles.actions}>
               <button type="button" className={styles.saveButton} onClick={saveProfile} disabled={saving}>
                 {saving ? 'saving…' : 'save'}
@@ -147,7 +312,8 @@ export function ProfilePage() {
       </div>
 
       {stats && (
-        <>
+        <div className={styles.sectionCard}>
+          <div className={styles.sectionTitle}>your stats</div>
           <div className={styles.statCards}>
             <div className={styles.statCard}>
               <div className={styles.statValue}>
@@ -171,45 +337,21 @@ export function ProfilePage() {
               </div>
               <div className={styles.statLabel}>acceptance rate</div>
             </div>
+            <div className={styles.statCard}>
+              <div className={styles.statValue}>
+                {stats.favoriteLanguage ? stats.favoriteLanguage.language : '—'}
+              </div>
+              <div className={styles.statLabel}>
+                {stats.favoriteLanguage
+                  ? `${stats.favoriteLanguage.share}% of submissions`
+                  : 'favorite language'}
+              </div>
+            </div>
           </div>
-
-          <div className={styles.sectionCard}>
-            <div className={styles.sectionTitle}>progress by difficulty</div>
-            {(['easy', 'medium', 'hard'] as Difficulty[]).map((d) => {
-              const p = stats.byDifficulty[d]
-              const pct = p.total > 0 ? Math.round((p.solved / p.total) * 100) : 0
-              return (
-                <div className={styles.progressRow} key={d}>
-                  <span className={styles.progressLabel}>{d}</span>
-                  <div className={styles.progressTrack}>
-                    <div className={`${styles.progressFill} ${DIFFICULTY_FILL[d]}`} style={{ width: `${pct}%` }} />
-                  </div>
-                  <span className={styles.progressCount}>
-                    {p.solved}/{p.total}
-                  </span>
-                </div>
-              )
-            })}
-          </div>
-
-          <div className={styles.sectionCard}>
-            <div className={styles.sectionTitle}>progress by category</div>
-            {stats.byCategory.map((c) => {
-              const pct = c.total > 0 ? Math.round((c.solved / c.total) * 100) : 0
-              return (
-                <div className={styles.progressRow} key={c.slug}>
-                  <span className={styles.progressLabel}>{c.name}</span>
-                  <div className={styles.progressTrack}>
-                    <div className={`${styles.progressFill} ${styles.fillAccent}`} style={{ width: `${pct}%` }} />
-                  </div>
-                  <span className={styles.progressCount}>
-                    {c.solved}/{c.total}
-                  </span>
-                </div>
-              )
-            })}
-          </div>
-        </>
+          <Link to="/stats" className={styles.recentLink}>
+            view all stats →
+          </Link>
+        </div>
       )}
 
       {recent && recent.items.length > 0 && (

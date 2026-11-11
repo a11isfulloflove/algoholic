@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import type { Difficulty, StatsResponse } from '@algoholic/shared'
+import type { Difficulty, FavoriteLanguage, StatsResponse } from '@algoholic/shared'
 import { prisma } from '../db'
 import { requireUser } from '../auth/middleware'
 
@@ -13,7 +13,7 @@ statsRouter.get('/', async (req, res) => {
     return res.status(401).json({ error: 'authentication required' })
   }
 
-  const [problems, solvedRows, submissionCount, acceptedCount] = await Promise.all([
+  const [problems, solvedRows, submissionCount, acceptedCount, languageCounts] = await Promise.all([
     prisma.problem.findMany({
       where: { isPublished: true },
       select: {
@@ -29,9 +29,34 @@ statsRouter.get('/', async (req, res) => {
     }),
     prisma.submission.count({ where: { userId: user.id } }),
     prisma.submission.count({ where: { userId: user.id, status: 'ACCEPTED' } }),
+    prisma.submission.groupBy({
+      by: ['language'],
+      where: { userId: user.id },
+      _count: { _all: true },
+    }),
   ])
 
   const solvedIds = new Set(solvedRows.map((r) => r.problemId))
+
+  let jsCount = 0
+  let tsCount = 0
+  for (const row of languageCounts) {
+    const count = row._count._all
+    if (row.language === 'JAVASCRIPT') {
+      jsCount = count
+    } else if (row.language === 'TYPESCRIPT') {
+      tsCount = count
+    }
+  }
+  const languageTotal = jsCount + tsCount
+  let favoriteLanguage: FavoriteLanguage | null = null
+  if (languageTotal > 0) {
+    const jsShare = Math.round((jsCount / languageTotal) * 100)
+    favoriteLanguage =
+      jsCount >= tsCount
+        ? { language: 'javascript', share: jsShare }
+        : { language: 'typescript', share: 100 - jsShare }
+  }
 
   const byDifficulty: StatsResponse['byDifficulty'] = {
     easy: { solved: 0, total: 0 },
@@ -65,6 +90,7 @@ statsRouter.get('/', async (req, res) => {
     byCategory: [...categoryMap.values()].sort(
       (a, b) => b.total - a.total || a.name.localeCompare(b.name),
     ),
+    favoriteLanguage,
   }
   res.json(body)
 })

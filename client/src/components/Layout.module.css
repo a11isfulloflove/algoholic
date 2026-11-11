@@ -46,48 +46,124 @@
 .navLink {
   color: var(--text-soft);
   font-weight: 500;
+  background: none;
+  border: 1.5px solid transparent;
+  padding: 5px 12px;
+  font-size: 14px;
+  border-radius: 999px;
+  --tab-outline:
+    0 0 2px var(--outline-pink),
+    0 0 6px var(--outline-pink),
+    0 0 14px var(--outline-pink);
 }
 
 .navLink:hover {
   color: var(--text);
+  border-color: transparent;
   text-decoration: none;
+  text-shadow: var(--tab-outline);
 }
 
-.userChip {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 4px 12px 4px 6px;
+.navLink:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.navLinkActive,
+.navLinkActive:hover {
+  color: var(--accent-text);
+  font-weight: 700;
+  border-color: transparent;
+  background: none;
+  text-shadow: var(--tab-outline);
+}
+
+.menuWrap {
+  position: relative;
+}
+
+.avatarButton {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
   border: 1px solid var(--border-strong);
-  border-radius: 999px;
-  background: var(--surface);
-  color: var(--text);
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.userChip:hover {
-  border-color: var(--accent);
-  text-decoration: none;
-}
-
-.userAvatar {
-  font-size: 18px;
+  background: var(--accent-soft);
+  font-size: 19px;
   line-height: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 26px;
-  height: 26px;
-  background: var(--accent-soft);
-  border-radius: 50%;
+  cursor: pointer;
 }
 
-.userName {
-  max-width: 140px;
+.avatarButton:hover,
+.avatarButton:focus-visible {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 10px);
+  min-width: 230px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(43, 46, 54, 0.12);
+  padding: 6px;
+  z-index: 60;
+}
+
+.menuIdentity {
+  padding: 10px 12px 8px;
+}
+
+.menuName {
+  font-weight: 700;
+  font-size: 14px;
+  max-width: 200px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.menuEmail {
+  color: var(--text-soft);
+  font-size: 12px;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.menuDivider {
+  height: 1px;
+  background: var(--border);
+  margin: 5px 6px;
+}
+
+.menuItem {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: none;
+  color: var(--text);
+  font-size: 14px;
+  padding: 9px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.menuItem:hover {
+  background: var(--accent-soft);
+  text-decoration: none;
+}
+
+.menuItemDanger:hover {
+  background: var(--hard-bg);
+  color: var(--hard);
 }
 
 .logoutButton {

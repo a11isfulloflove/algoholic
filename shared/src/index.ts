@@ -85,7 +85,6 @@ export const AVATARS = [
   '🐢',
   '🦋',
   '🐳',
-  '🐬',
   '🦕',
   '🐿️',
   '🦔',
@@ -93,14 +92,43 @@ export const AVATARS = [
   '👾',
   '🤖',
   '👻',
-  '⚡',
+  '🦜',
   '🔮',
+  '🐧',
+  '🐝',
+  '🐞',
+  '🦈',
+  '🦩',
+  '🐠',
+  '🦭',
+  '🦥',
+  '🦖',
+  '🎃',
+  '🧙',
+  '🧚',
+  '🥷',
+  '👽',
+  '🍄',
+  '🌸',
+  '🌈',
+  '⭐',
+  '🌙',
+  '🌚',
+  '🌝',
+  '🔥',
+  '🍓',
+  '🍒',
+  '🍑',
+  '🍍',
+  '🥑',
+  '🍉',
+  '⛄',
 ] as const
 export type Avatar = (typeof AVATARS)[number]
 
 export interface UserPublic {
   id: number
-  email: string
+  username: string
   name: string | null
   avatar: string | null
   createdAt: string
@@ -118,6 +146,11 @@ export interface CategoryProgress {
   total: number
 }
 
+export interface FavoriteLanguage {
+  language: Language
+  share: number
+}
+
 export interface StatsResponse {
   solvedTotal: number
   problemsTotal: number
@@ -125,6 +158,7 @@ export interface StatsResponse {
   accepted: number
   byDifficulty: Record<Difficulty, DifficultyProgress>
   byCategory: CategoryProgress[]
+  favoriteLanguage: FavoriteLanguage | null
 }
 
 export interface TestCaseResult {

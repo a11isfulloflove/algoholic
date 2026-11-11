@@ -143,7 +143,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 14px;
-  margin-bottom: 24px;
+  margin-bottom: 0;
 }
 
 .statCard {
@@ -229,6 +229,91 @@
   color: var(--text-soft);
   text-align: right;
   font-variant-numeric: tabular-nums;
+}
+
+.editColumns {
+  display: grid;
+  grid-template-columns: minmax(300px, 380px) minmax(0, 1fr);
+  gap: 8px 40px;
+  align-items: start;
+}
+
+@media (max-width: 860px) {
+  .editColumns {
+    grid-template-columns: 1fr;
+  }
+}
+
+.identityColumn {
+  min-width: 0;
+}
+
+.securityColumn {
+  min-width: 0;
+  border-left: 1px dashed var(--border-strong);
+  padding-left: 32px;
+}
+
+@media (max-width: 860px) {
+  .securityColumn {
+    border-left: none;
+    padding-left: 0;
+  }
+}
+
+.pwSection {
+  min-width: 0;
+  max-width: 420px;
+}
+
+.pwSection + .pwSection {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px dashed var(--border-strong);
+}
+
+.pwSectionTitle {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 14px;
+}
+
+.pwSuccess {
+  background: var(--easy-bg);
+  color: var(--easy);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+.pwError {
+  background: var(--hard-bg);
+  color: var(--hard);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+.updateButton {
+  border: 1px solid var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent-text);
+  border-radius: 8px;
+  padding: 8px 20px;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.updateButton:hover {
+  background: var(--accent);
+  color: #fff;
+}
+
+.soft {
+  color: var(--text-soft);
+  font-size: 14px;
 }
 
 .recentLink {

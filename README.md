@@ -59,14 +59,14 @@ Solutions run in a [Piston](https://github.com/engineer-man/piston) sandbox (iso
 | `/profile` | Your emoji avatar + name, progress by difficulty and category, acceptance rate, recent submissions |
 | `/submissions` | Full submission history with code viewer |
 
-Users pick an emoji avatar and a display name at registration (editable on the profile page) — no personal data beyond an email.
+Users pick a username, an emoji avatar and an optional display name at registration (editable on the profile page) — no personal data collected.
 
 ## API
 
 | Endpoint | Description |
 |---|---|
 | `GET /api/health` | Liveness check |
-| `POST /api/auth/register` | Create account (email, password, optional name + emoji avatar) |
+| `POST /api/auth/register` | Create account (username, password, optional name + emoji avatar) |
 | `POST /api/auth/login` / `POST /api/auth/logout` | Session via httpOnly JWT cookie |
 | `GET /api/auth/me` · `PATCH /api/auth/me` | Current user · update name/avatar |
 | `GET /api/categories` | Categories with problem counts |

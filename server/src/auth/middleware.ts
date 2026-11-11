@@ -12,7 +12,13 @@ declare global {
   }
 }
 
-const USER_SELECT = { id: true, email: true, name: true, avatar: true, createdAt: true } as const
+const USER_SELECT = {
+  id: true,
+  username: true,
+  name: true,
+  avatar: true,
+  createdAt: true,
+} as const
 
 export async function attachUser(
   req: Request,

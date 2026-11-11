@@ -14,14 +14,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .finally(() => setLoading(false))
   }, [])
 
-  const login = useCallback(async (email: string, password: string) => {
-    const r = await api.login(email, password)
+  const login = useCallback(async (username: string, password: string) => {
+    const r = await api.login(username, password)
     setUser(r.user)
   }, [])
 
   const register = useCallback(
-    async (email: string, password: string, name?: string, avatar?: string) => {
-      const r = await api.register(email, password, name, avatar)
+    async (username: string, password: string, name?: string, avatar?: string) => {
+      const r = await api.register(username, password, name, avatar)
       setUser(r.user)
     },
     [],
