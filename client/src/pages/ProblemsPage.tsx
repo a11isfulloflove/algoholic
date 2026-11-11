@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { api } from '../api'
 import type { CategorySummary, ProblemListResponse } from '@algoholic/shared'
+import { Dropdown } from '../components/Dropdown'
 import { ProblemTable } from '../components/ProblemTable'
 import { useAuth } from '../use-auth'
 import styles from './ProblemsPage.module.css'
@@ -94,38 +95,35 @@ export function ProblemsPage() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-        <select
-          className={styles.select}
+        <Dropdown
           value={category}
-          onChange={(e) => setCategory(e.target.value)}
-        >
-          <option value="">all categories</option>
-          {categories.map((c) => (
-            <option key={c.slug} value={c.slug}>
-              {c.name} ({c.problemCount})
-            </option>
-          ))}
-        </select>
-        <select
-          className={styles.select}
+          onChange={setCategory}
+          placeholder="all categories"
+          options={categories.map((c) => ({
+            value: c.slug,
+            label: `${c.name} (${c.problemCount})`,
+          }))}
+        />
+        <Dropdown
           value={difficulty}
-          onChange={(e) => setDifficulty(e.target.value)}
-        >
-          <option value="">all difficulties</option>
-          <option value="easy">easy</option>
-          <option value="medium">medium</option>
-          <option value="hard">hard</option>
-        </select>
+          onChange={setDifficulty}
+          placeholder="all difficulties"
+          options={[
+            { value: 'easy', label: 'easy' },
+            { value: 'medium', label: 'medium' },
+            { value: 'hard', label: 'hard' },
+          ]}
+        />
         {user && (
-          <select
-            className={styles.select}
+          <Dropdown
             value={status}
-            onChange={(e) => setStatus(e.target.value)}
-          >
-            <option value="">solved & unsolved</option>
-            <option value="solved">solved</option>
-            <option value="unsolved">unsolved</option>
-          </select>
+            onChange={setStatus}
+            placeholder="all"
+            options={[
+              { value: 'solved', label: 'solved' },
+              { value: 'unsolved', label: 'unsolved' },
+            ]}
+          />
         )}
       </div>
 
