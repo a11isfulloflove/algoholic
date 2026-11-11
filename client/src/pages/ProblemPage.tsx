@@ -8,20 +8,6 @@ import { DifficultyBadge } from '../components/DifficultyBadge'
 import { EditorPanel } from '../components/EditorPanel'
 import styles from './ProblemPage.module.css'
 
-function revealedHintsKey(slug: string): string {
-  return `algoholic:hints:${slug}`
-}
-
-function loadRevealedHints(slug: string): number {
-  try {
-    const raw = localStorage.getItem(revealedHintsKey(slug))
-    const n = raw ? Number(raw) : 0
-    return Number.isInteger(n) && n > 0 ? n : 0
-  } catch {
-    return 0
-  }
-}
-
 export function ProblemPage({ slug: slugProp }: { slug?: string } = {}) {
   const params = useParams<{ slug: string }>()
   const slug = slugProp ?? params.slug
@@ -31,7 +17,7 @@ export function ProblemPage({ slug: slugProp }: { slug?: string } = {}) {
   const [notFound, setNotFound] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const [revealedHints, setRevealedHints] = useState(() => (slug ? loadRevealedHints(slug) : 0))
+  const [revealedHints, setRevealedHints] = useState(0)
   const [solution, setSolution] = useState<ProblemSolution | null>(null)
   const [solutionOpen, setSolutionOpen] = useState(false)
   const [solutionError, setSolutionError] = useState<string | null>(null)
@@ -42,7 +28,7 @@ export function ProblemPage({ slug: slugProp }: { slug?: string } = {}) {
     setLoading(true)
     setNotFound(false)
     setError(null)
-    setRevealedHints(slug ? loadRevealedHints(slug) : 0)
+    setRevealedHints(0)
     setSolution(null)
     setSolutionOpen(false)
     setSolutionError(null)
@@ -77,13 +63,7 @@ export function ProblemPage({ slug: slugProp }: { slug?: string } = {}) {
 
   function revealNextHint() {
     if (!problem?.hints) return
-    const next = Math.min(revealedHints + 1, problem.hints.length)
-    setRevealedHints(next)
-    try {
-      localStorage.setItem(revealedHintsKey(problem.slug), String(next))
-    } catch {
-      // storage unavailable — reveals just won't persist
-    }
+    setRevealedHints((n) => Math.min(n + 1, problem.hints!.length))
   }
 
   async function toggleSolution() {
@@ -151,10 +131,17 @@ export function ProblemPage({ slug: slugProp }: { slug?: string } = {}) {
             </div>
 
             <div className={styles.markdown}>
-              <Markdown remarkPlugins={[remarkGfm]}>{problem.description}</Markdown>
+              <Markdown
+                remarkPlugins={[remarkGfm]}
+                components={{
+                  h3: ({ children }) => <h3 className={styles.sectionTitle}>{children}</h3>,
+                }}
+              >
+                {problem.description}
+              </Markdown>
             </div>
 
-            <h3 className={styles.markdown}>samples</h3>
+            <h3 className={styles.sectionTitle}>samples</h3>
             <table className={styles.samples}>
               <thead>
                 <tr>
@@ -176,7 +163,7 @@ export function ProblemPage({ slug: slugProp }: { slug?: string } = {}) {
 
             {problem.hintsCount > 0 && (
               <div className={styles.hintsBlock}>
-                <div className={styles.hintsTitle}>💡 hints</div>
+                <h3 className={styles.sectionTitle}>hints</h3>
                 {!problem.hints ? (
                   <p className={styles.softText}>
                     <Link to="/login">log in</Link> to reveal {problem.hintsCount} gentle
@@ -186,7 +173,7 @@ export function ProblemPage({ slug: slugProp }: { slug?: string } = {}) {
                   <>
                     {problem.hints.slice(0, revealedHints).map((h, i) => (
                       <div key={i} className={styles.hintCard}>
-                        <span className={styles.hintNumber}>{i + 1}</span>
+                        <span className={styles.hintNumber}>{i + 1}.&nbsp;</span>
                         <span>{h}</span>
                       </div>
                     ))}
@@ -206,15 +193,17 @@ export function ProblemPage({ slug: slugProp }: { slug?: string } = {}) {
 
             {problem.related.length > 0 && (
               <div className={styles.tryNextBlock}>
-                <div className={styles.hintsTitle}>🧭 try next</div>
-                <div className={styles.tryNextChips}>
+                <h3 className={styles.sectionTitle}>try next</h3>
+                <div className={styles.tryNextList}>
                   {problem.related.map((r) => (
-                    <Link key={r.slug} to={`/problems/${r.slug}`} className={styles.tryNextChip}>
-                      <span className={r.solved ? styles.tryNextSolved : ''}>
-                        {r.solved ? '✓ ' : ''}
-                        {r.title}
+                    <Link key={r.slug} to={`/problems/${r.slug}`} className={styles.tryNextRow}>
+                      <span className={styles.tryNextInner}>
+                        <span className={styles.tryNextTitle}>
+                          {r.solved && <span className={styles.tryNextCheck}>✓</span>}
+                          {r.title}
+                        </span>
+                        <DifficultyBadge difficulty={r.difficulty} />
                       </span>
-                      <DifficultyBadge difficulty={r.difficulty} />
                     </Link>
                   ))}
                 </div>

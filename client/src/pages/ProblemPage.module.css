@@ -27,99 +27,109 @@
 }
 
 @media (max-width: 1100px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}
+
 .softText {
   color: var(--text-soft);
   font-size: 14px;
 }
 
 .hintsBlock {
-  margin-top: 24px;
-  padding-top: 18px;
+  margin-top: 28px;
+  padding-top: 20px;
   border-top: 1px dashed var(--border-strong);
 }
 
-.hintsTitle {
-  font-size: 13px;
+.sectionTitle {
+  font-size: 16px;
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--text-soft);
-  margin-bottom: 10px;
+  margin: 0 0 10px;
+  letter-spacing: 0;
 }
 
 .hintCard {
   display: flex;
-  gap: 12px;
+  gap: 8px;
   align-items: baseline;
   background: var(--accent-soft);
   border: 1px solid var(--accent);
   border-radius: 8px;
   padding: 10px 14px;
   font-size: 14px;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
 .hintNumber {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: var(--surface);
-  border: 1px solid var(--accent);
-  color: var(--accent-text);
-  font-size: 12px;
   font-weight: 700;
+  color: var(--accent-text);
   flex-shrink: 0;
 }
 
 .revealButton {
-  border: 1px dashed var(--accent);
-  background: transparent;
-  color: var(--accent-text);
+  margin-top: 8px;
+  border: none;
+  background: var(--accent);
+  color: #fff;
   border-radius: 8px;
-  padding: 7px 16px;
+  padding: 6px 18px;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .revealButton:hover {
-  background: var(--accent-soft);
+  background: var(--accent-hover);
 }
 
 .tryNextBlock {
-  margin-top: 24px;
-  padding-top: 18px;
+  margin-top: 28px;
+  padding-top: 20px;
   border-top: 1px dashed var(--border-strong);
 }
 
-.tryNextChips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
+.tryNextList {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
 }
 
-.tryNextChip {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  border: 1px solid var(--border-strong);
-  border-radius: 999px;
-  padding: 6px 14px;
-  font-size: 14px;
+.tryNextRow {
+  display: block;
+  width: 100%;
+  padding: 9px 14px;
   color: var(--text);
-  background: var(--surface);
 }
 
-.tryNextChip:hover {
-  border-color: var(--accent);
+.tryNextRow + .tryNextRow {
+  border-top: 1px solid var(--border);
+}
+
+.tryNextRow:hover {
+  background: var(--accent-soft);
   text-decoration: none;
 }
 
-.tryNextSolved {
-  color: var(--easy);
+.tryNextInner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.tryNextTitle {
+  font-size: 14px;
   font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.tryNextCheck {
+  color: var(--easy);
+  font-weight: 700;
 }
 
 .solutionCard {
@@ -167,11 +177,6 @@
   font-weight: 700;
 }
 
-.layout {
-    grid-template-columns: 1fr;
-  }
-}
-
 .statement {
   min-width: 0;
 }
@@ -201,7 +206,6 @@
 }
 
 .markdown h3 {
-  font-size: 16px;
   margin: 24px 0 8px;
 }
 
