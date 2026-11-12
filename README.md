@@ -1,78 +1,123 @@
-# algoholic
+# 💖 algoholic
 
-A minimal LeetCode-style platform: algorithmic problems with categories and difficulty, and an auto-judge that runs your solution against test cases. No leaderboards, no ads, no noise — just problems.
+A distraction-free algorithm practice platform with a real sandboxed judge —
+solve in JavaScript or TypeScript, reveal hints at your own pace, and unlock
+the author's solution once you've cracked the problem yourself.
 
-## Structure
+No leaderboards, no ads, no noise. Just problems.
 
+![React](https://img.shields.io/badge/React_19-61DAFB?logo=react&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)
+![Express](https://img.shields.io/badge/Express_5-000000?logo=express&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL_17-4169E1?logo=postgresql&logoColor=white)
+![Prisma](https://img.shields.io/badge/Prisma-2D3748?logo=prisma&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-646CFF?logo=vite&logoColor=white)
+
+## ✨ Features
+
+- ⚖️ **a real judge** — submissions run in a sandboxed Linux environment (no network,
+  CPU/memory/time caps) and get honest verdicts: accepted, wrong answer,
+  time limit exceeded, runtime error, or compile error with line numbers
+- 💡 **hints, not spoilers** — every problem ships 2–3 progressive hints, free for
+  logged-in users and revealed one at a time, so you only get as much help as you ask for
+- 🔓 **earned solutions** — the author's reference solution (with a "why this works"
+  note and complexity analysis) unlocks *only after your own accepted submission*
+- 📅 **problem of the day** · 🎲 **random unsolved pick** · 🧭 **try-next ladders**
+  that guide you from one problem to its natural successors
+- 📊 **personal stats** — progress by difficulty and category, acceptance rate,
+  favorite language, full submission history with code viewer
+- 🧩 **a curated problem set** — 35 classic problems, 399 tests, 12 categories —
+  where every reference solution is itself verified by the platform's own judge
+  before it ships (`npm run verify:solutions`)
+
+## 🏗 Architecture
+
+```mermaid
+flowchart LR
+    B["Browser<br/>React 19 · Vite · CodeMirror"] -->|"/api proxy"| A["Express 5 API<br/>TypeScript · Zod · JWT"]
+    A -->|"Prisma ORM"| P[("PostgreSQL 17<br/>problems · users · submissions")]
+    A -->|"HTTP"| S["Piston sandbox<br/>isolated · no network · resource caps"]
 ```
-client/   React 19 + Vite + TypeScript frontend
-server/   Express 5 + TypeScript API (Prisma + PostgreSQL)
-shared/   Types shared between client and server
-```
 
-Infrastructure (via `docker-compose.yml`): PostgreSQL 17 + [Piston](https://github.com/engineer-man/piston) (sandboxed code execution for the judge).
+A TypeScript monorepo (npm workspaces): `client/` (React + Vite), `server/`
+(Express + Prisma), `shared/` (types and constants used by both sides — one
+source of truth, zero duplicated API contracts).
 
-## Getting started
+## ⚖️ The judge
 
-Prerequisites: Node 20+, Docker
+Every submission travels the same pipeline:
+
+1. **Validate & transpile** — Zod-validated input; esbuild transpiles TypeScript and
+   syntax-checks JavaScript (errors become compile verdicts before any sandbox runs)
+2. **Harness** — user code is wrapped in a runner that calls the exported function with
+   each test case and reports one JSON result per test; stray `console.log` output is
+   captured and shown back to the author
+3. **Sandbox** — all tests execute in a single [Piston](https://github.com/engineer-man/piston)
+   run: isolated Linux namespaces, networking disabled, per-problem time and memory caps
+4. **Verdict** — results are compared server-side against expectations (canonical JSON,
+   key-order-insensitive, floating-point tolerance); hidden test answers **never leave
+   the server**
+
+The judge is also its own quality gate: all 35 reference solutions are fed through it
+programmatically, and any that isn't accepted fails the build story.
+
+## 🧰 Tech stack
+
+| Layer | Choice | Why |
+|---|---|---|
+| UI | React 19, Vite, CodeMirror 6, CSS modules | fast DX, zero UI-framework lock-in |
+| API | Express 5, TypeScript, Zod | typed contracts end to end |
+| Data | PostgreSQL 17, Prisma | typed queries, migrations, studio |
+| Execution | Piston (Docker) | sandboxed untrusted code without building a jail |
+| Sessions | httpOnly JWT cookies, bcrypt | no token handling in client JS |
+| Quality | Vitest, oxlint | unit tests for the judge's comparison logic |
+
+## 🚀 Getting started
+
+Prerequisites: Node 20+, Docker.
 
 ```bash
 npm install
-cp server/.env.example server/.env   # then edit: set a real JWT_SECRET
-npm run infra:up        # start postgres + piston containers
-npm run db:migrate      # apply prisma migrations
-npm run db:seed         # seed categories + 10 problems with tests
-npm run judge:setup     # one-time: install node runtime into piston + smoke test
-npm run dev             # client on :5173 (proxies /api), server on :4000
+cp server/.env.example server/.env    # set a real JWT_SECRET
+npm run infra:up        # postgres + piston containers
+npm run db:migrate      # apply migrations
+npm run db:seed         # 35 problems · 399 tests (idempotent)
+npm run judge:setup     # one-time: node runtime into piston + smoke test
+npm run dev             # app on http://localhost:5173 (API proxied)
 ```
 
-## Scripts
+To share the app with other devices on your network: `npm run dev:lan`.
 
 | Command | What it does |
 |---|---|
-| `npm run dev` | Run client + server concurrently |
-| `npm run dev:client` / `npm run dev:server` | Run just one workspace |
-| `npm run build` | Build client + server |
-| `npm run lint` | Lint all workspaces (oxlint) |
-| `npm test` | Run server unit tests (vitest) |
-| `npm run infra:up` / `npm run infra:down` | Start / stop the docker stack |
-| `npm run judge:setup` | Install node into piston and run a smoke test |
-| `npm run db:migrate` | Apply database migrations (dev) |
-| `npm run db:seed` | Seed categories and problems (idempotent) |
-| `npm run db:studio` | Browse the database in Prisma Studio |
+| `npm run dev` / `npm run dev:lan` | Client + server (localhost / LAN-exposed) |
+| `npm run build` · `npm run lint` · `npm test` | Build, oxlint, vitest |
+| `npm run infra:up` / `infra:down` | Start / stop the docker stack |
+| `npm run db:migrate` · `db:seed` · `db:studio` | Migrations, seed, Prisma Studio |
+| `npm run judge:setup` | Install node into piston + smoke test |
+| `npm run verify:solutions` | Re-judge all 35 reference solutions |
 
-## The judge
-
-Solutions run in a [Piston](https://github.com/engineer-man/piston) sandbox (isolated Linux namespaces, no network, CPU/memory/time caps). Flow:
-
-1. Server validates and transpiles the submission (esbuild; TS and JS syntax errors become compile errors)
-2. User code is wrapped in a harness that calls the exported function with each test case and prints one JSON result per test
-3. All tests execute in one sandbox run (per-problem time limit + headroom)
-4. Results are compared server-side (canonical JSON, key-order-insensitive, float tolerance); hidden test expectations never leave the server
-
-## The app
+## 🧭 The app
 
 | Page | What |
 |---|---|
-| `/problems` | Browse, filter (category / difficulty / solved / search), solved ✓ marks |
-| `/problems/:slug` | Statement + samples on the left, CodeMirror editor with Run/Submit on the right (`Ctrl/Cmd+Enter` to submit), drafts saved locally |
-| `/profile` | Your emoji avatar + name, progress by difficulty and category, acceptance rate, recent submissions |
-| `/submissions` | Full submission history with code viewer |
+| `/problems` | browse & filter (category · difficulty · solved · search) |
+| `/problems/:slug` | statement, samples, hints, try-next — plus the CodeMirror editor with Run / Submit (`Ctrl/Cmd+Enter`), local drafts, and verdict panel |
+| `/daily` | problem of the day (same pick for everyone, changes at midnight) |
+| `/stats` | progress by difficulty & category, acceptance rate, favorite language |
+| `/submissions` | full history, each row opens the exact code you sent |
+| `/profile` | username & 56 emoji avatars, edit identity, change password |
 
-Users pick a username, an emoji avatar and an optional display name at registration (editable on the profile page) — no personal data collected.
-
-## API
+## 📮 API
 
 | Endpoint | Description |
 |---|---|
-| `GET /api/health` | Liveness check |
-| `POST /api/auth/register` | Create account (username, password, optional name + emoji avatar) |
-| `POST /api/auth/login` / `POST /api/auth/logout` | Session via httpOnly JWT cookie |
-| `GET /api/auth/me` · `PATCH /api/auth/me` | Current user · update name/avatar |
-| `GET /api/categories` | Categories with problem counts |
-| `GET /api/problems` | List — filters: `category`, `difficulty`, `status` (solved/unsolved), `q`, `page` |
-| `GET /api/problems/:slug` | Statement, samples, starter code, solved flag |
-| `POST /api/problems/:slug/run` | Run code against sample tests (requires auth) |
-| `POST /api/problems/:slug/submit` | Submit for judging against all tests (requires auth) |
-| `GET /api/submissions` | Own history — filter: `problem`, `page` · `GET /api/submissions/:id` for code |
-| `GET /api/stats` | Personal progress: solved by difficulty and category, acceptance rate |
+| `POST /api/auth/register` · `login` · `logout` | username + password, httpOnly JWT cookie |
+| `GET/PATCH /api/auth/me` · `POST /api/auth/change-password` · `change-username` | account & credentials (password-verified changes) |
+| `GET /api/problems` | list — filters: category, difficulty, solved status, search, paging |
+| `GET /api/problems/:slug` | statement, samples, hints (logged-in), related problems, solved flag |
+| `POST /api/problems/:slug/run` · `submit` | sample run · full judged submission |
+| `GET /api/problems/:slug/solution` | author's solution — **403 until your own accepted submission** |
+| `GET /api/submissions` · `/api/submissions/:id` | your history and code |
+| `GET /api/stats` | personal progress aggregates |
