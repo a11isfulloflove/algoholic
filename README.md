@@ -1,81 +1,47 @@
-# 💖 algoholic
+# algoholic
 
-A distraction-free algorithm practice platform with a real sandboxed judge —
-solve in JavaScript or TypeScript, reveal hints at your own pace, and unlock
-the author's solution once you've cracked the problem yourself.
+A minimal platform for practicing algorithmic problems: pick a problem, write JavaScript or TypeScript in the browser, and submit it to an automated judge that runs your code in a real sandbox against visible samples and hidden tests.
 
-No leaderboards, no ads, no noise. Just problems.
+It is built around a simple principle: feedback should be honest and help should be optional. Verdicts are exact — accepted, wrong answer, time limit exceeded, runtime error, compile error with line numbers. Hints are revealed one at a time, only if you ask for them. The author's reference solution unlocks only after your own accepted submission. No leaderboards, no ads, no noise.
 
-![React](https://img.shields.io/badge/React_19-61DAFB?logo=react&logoColor=white)
-![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)
-![Express](https://img.shields.io/badge/Express_5-000000?logo=express&logoColor=white)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL_17-4169E1?logo=postgresql&logoColor=white)
-![Prisma](https://img.shields.io/badge/Prisma-2D3748?logo=prisma&logoColor=white)
-![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white)
-![Vite](https://img.shields.io/badge/Vite-646CFF?logo=vite&logoColor=white)
+## Features
 
-## ✨ Features
+- Problems with categories, difficulty, sample tests and hidden tests
+- Run against samples or submit for full judging; `Ctrl/Cmd+Enter` to submit; drafts are saved locally per problem and language
+- TypeScript is transpiled with esbuild before execution — TS and JS syntax errors become compile verdicts before any sandbox run
+- Progressive hints per problem, revealed one at a time, free for logged-in users
+- The author's solution, with a "why this works" note and complexity target, unlocks only after your own accepted submission — the answer is unreachable before that, server-side
+- Problem of the day, random unsolved pick, and "try next" ladders between related problems
+- Personal stats: progress by difficulty and category, acceptance rate, favorite language
+- Full submission history with the exact code of every attempt
+- 35 problems, 399 tests, 12 categories — every reference solution is re-verified by the platform's own judge (`npm run verify:solutions`)
 
-- ⚖️ **a real judge** — submissions run in a sandboxed Linux environment (no network,
-  CPU/memory/time caps) and get honest verdicts: accepted, wrong answer,
-  time limit exceeded, runtime error, or compile error with line numbers
-- 💡 **hints, not spoilers** — every problem ships 2–3 progressive hints, free for
-  logged-in users and revealed one at a time, so you only get as much help as you ask for
-- 🔓 **earned solutions** — the author's reference solution (with a "why this works"
-  note and complexity analysis) unlocks *only after your own accepted submission*
-- 📅 **problem of the day** · 🎲 **random unsolved pick** · 🧭 **try-next ladders**
-  that guide you from one problem to its natural successors
-- 📊 **personal stats** — progress by difficulty and category, acceptance rate,
-  favorite language, full submission history with code viewer
-- 🧩 **a curated problem set** — 35 classic problems, 399 tests, 12 categories —
-  where every reference solution is itself verified by the platform's own judge
-  before it ships (`npm run verify:solutions`)
+## Project structure
 
-## 🏗 Architecture
-
-```mermaid
-flowchart LR
-    B["Browser<br/>React 19 · Vite · CodeMirror"] -->|"/api proxy"| A["Express 5 API<br/>TypeScript · Zod · JWT"]
-    A -->|"Prisma ORM"| P[("PostgreSQL 17<br/>problems · users · submissions")]
-    A -->|"HTTP"| S["Piston sandbox<br/>isolated · no network · resource caps"]
+```
+algoholic/
+├── client/             # React 19 + Vite + TypeScript frontend
+│   └── src/
+│       ├── pages/      # problems, problem detail, daily, stats, submissions, profile
+│       ├── components/ # editor panel, dropdowns, tables, badges
+│       └── api.ts      # typed fetch client built on shared types
+├── server/
+│   ├── prisma/         # schema, migrations, seed (35 problems), verify-solutions
+│   └── src/
+│       ├── routes/     # auth, problems, submissions, stats, categories
+│       ├── auth/       # bcrypt hashing, JWT sessions, cookie helpers, middleware
+│       └── judge/      # transpile, harness, piston client, comparison, orchestrator
+├── shared/             # @algoholic/shared — types used by client and server
+├── docker-compose.yml  # PostgreSQL 17 + Piston sandbox
+└── package.json        # npm workspaces root
 ```
 
-A TypeScript monorepo (npm workspaces): `client/` (React + Vite), `server/`
-(Express + Prisma), `shared/` (types and constants used by both sides — one
-source of truth, zero duplicated API contracts).
+## Prerequisites
 
-## ⚖️ The judge
+- Node.js (v20+)
+- Docker — for PostgreSQL and the Piston sandbox
 
-Every submission travels the same pipeline:
-
-1. **Validate & transpile** — Zod-validated input; esbuild transpiles TypeScript and
-   syntax-checks JavaScript (errors become compile verdicts before any sandbox runs)
-2. **Harness** — user code is wrapped in a runner that calls the exported function with
-   each test case and reports one JSON result per test; stray `console.log` output is
-   captured and shown back to the author
-3. **Sandbox** — all tests execute in a single [Piston](https://github.com/engineer-man/piston)
-   run: isolated Linux namespaces, networking disabled, per-problem time and memory caps
-4. **Verdict** — results are compared server-side against expectations (canonical JSON,
-   key-order-insensitive, floating-point tolerance); hidden test answers **never leave
-   the server**
-
-The judge is also its own quality gate: all 35 reference solutions are fed through it
-programmatically, and any that isn't accepted fails the build story.
-
-## 🧰 Tech stack
-
-| Layer | Choice | Why |
-|---|---|---|
-| UI | React 19, Vite, CodeMirror 6, CSS modules | fast DX, zero UI-framework lock-in |
-| API | Express 5, TypeScript, Zod | typed contracts end to end |
-| Data | PostgreSQL 17, Prisma | typed queries, migrations, studio |
-| Execution | Piston (Docker) | sandboxed untrusted code without building a jail |
-| Sessions | httpOnly JWT cookies, bcrypt | no token handling in client JS |
-| Quality | Vitest, oxlint | unit tests for the judge's comparison logic |
-
-## 🚀 Getting started
-
-Prerequisites: Node 20+, Docker.
+## Setup
 
 ```bash
 npm install
@@ -83,41 +49,48 @@ cp server/.env.example server/.env    # set a real JWT_SECRET
 npm run infra:up        # postgres + piston containers
 npm run db:migrate      # apply migrations
 npm run db:seed         # 35 problems · 399 tests (idempotent)
-npm run judge:setup     # one-time: node runtime into piston + smoke test
-npm run dev             # app on http://localhost:5173 (API proxied)
+npm run judge:setup     # one-time: install node runtime into piston + smoke test
+npm run dev             # http://localhost:5173 (API proxied)
 ```
 
-To share the app with other devices on your network: `npm run dev:lan`.
+`npm run dev:lan` exposes the dev server to other devices on your network.
 
-| Command | What it does |
+## Scripts
+
+| Command | Description |
 |---|---|
-| `npm run dev` / `npm run dev:lan` | Client + server (localhost / LAN-exposed) |
-| `npm run build` · `npm run lint` · `npm test` | Build, oxlint, vitest |
+| `npm run dev` | Start client and server concurrently |
+| `npm run dev:lan` | Same, with the client reachable from the local network |
+| `npm run build` | Type-check and build client and server |
+| `npm run lint` | oxlint across workspaces |
+| `npm test` | Server unit tests (vitest) — includes the judge's comparison logic |
 | `npm run infra:up` / `infra:down` | Start / stop the docker stack |
-| `npm run db:migrate` · `db:seed` · `db:studio` | Migrations, seed, Prisma Studio |
-| `npm run judge:setup` | Install node into piston + smoke test |
-| `npm run verify:solutions` | Re-judge all 35 reference solutions |
+| `npm run db:migrate` / `db:seed` / `db:studio` | Migrations, seed, Prisma Studio |
+| `npm run judge:setup` | Install the node runtime into piston and smoke-test it |
+| `npm run verify:solutions` | Re-judge all 35 reference solutions through the sandbox |
 
-## 🧭 The app
+## How judging works
 
-| Page | What |
-|---|---|
-| `/problems` | browse & filter (category · difficulty · solved · search) |
-| `/problems/:slug` | statement, samples, hints, try-next — plus the CodeMirror editor with Run / Submit (`Ctrl/Cmd+Enter`), local drafts, and verdict panel |
-| `/daily` | problem of the day (same pick for everyone, changes at midnight) |
-| `/stats` | progress by difficulty & category, acceptance rate, favorite language |
-| `/submissions` | full history, each row opens the exact code you sent |
-| `/profile` | username & 56 emoji avatars, edit identity, change password |
+Every submission travels the same pipeline:
 
-## 📮 API
+1. **Validate and transpile.** Input is validated with Zod; esbuild transpiles TypeScript and syntax-checks JavaScript. Broken code becomes a compile verdict without touching the sandbox.
+2. **Harness.** The user's code is wrapped in a runner that calls the exported function once per test case and prints one JSON result per test. Stray `console.log` output is captured and shown back to the author in the results panel.
+3. **Sandbox.** All tests execute in a single [Piston](https://github.com/engineer-man/piston) run: isolated Linux namespaces, networking disabled, per-problem time and memory caps. A hung test is identified by which results never arrived.
+4. **Verdict.** Results are compared server-side against expectations. Hidden test answers never leave the server — the API reports what your code returned, never what was expected.
 
-| Endpoint | Description |
-|---|---|
-| `POST /api/auth/register` · `login` · `logout` | username + password, httpOnly JWT cookie |
-| `GET/PATCH /api/auth/me` · `POST /api/auth/change-password` · `change-username` | account & credentials (password-verified changes) |
-| `GET /api/problems` | list — filters: category, difficulty, solved status, search, paging |
-| `GET /api/problems/:slug` | statement, samples, hints (logged-in), related problems, solved flag |
-| `POST /api/problems/:slug/run` · `submit` | sample run · full judged submission |
-| `GET /api/problems/:slug/solution` | author's solution — **403 until your own accepted submission** |
-| `GET /api/submissions` · `/api/submissions/:id` | your history and code |
-| `GET /api/stats` | personal progress aggregates |
+Comparison is canonical JSON with a small floating-point tolerance: object key order is ignored, array order is strict, and `1 !== true`. Verdicts map to the first failure — wrong answer with your output, runtime error with the message, time limit with the offending test index.
+
+The judge is also its own quality gate: all reference solutions are fed through it programmatically before shipping, and `npm run verify:solutions` re-runs the check at any time.
+
+## Adding problems
+
+Problems live in `server/prisma/seed.ts` — statement, starter code for JS and TS, sample and hidden tests, hints, the reference solution with its note, a target complexity, and related slugs for the "try next" ladder. Seeding uses upserts, so it is idempotent and re-runnable. After writing or editing a problem:
+
+```bash
+npm run db:seed
+npm run verify:solutions   # must pass before shipping
+```
+
+## Authentication
+
+Accounts are username-based — no emails, no personal data. Passwords are bcrypt-hashed, sessions are httpOnly JWT cookies, and credential changes (password or username) require the current password.
