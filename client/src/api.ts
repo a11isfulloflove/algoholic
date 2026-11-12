@@ -1,5 +1,6 @@
 import type {
   CategorySummary,
+  DailyProblemResponse,
   ProblemDetail,
   ProblemListResponse,
   ProblemSolution,
@@ -75,6 +76,7 @@ export const api = {
   },
   problem: (slug: string) => request<ProblemDetail>(`/api/problems/${slug}`),
   solution: (slug: string) => request<ProblemSolution>(`/api/problems/${slug}/solution`),
+  daily: () => request<DailyProblemResponse>('/api/daily'),
   run: (slug: string, body: { language: string; code: string }) =>
     request<RunSamplesResponse>(`/api/problems/${slug}/run`, {
       method: 'POST',
