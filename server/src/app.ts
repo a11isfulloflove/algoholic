@@ -3,6 +3,7 @@ import cookieParser from 'cookie-parser'
 import type { HealthResponse } from '@algoholic/shared'
 import { authRouter } from './routes/auth'
 import { categoriesRouter } from './routes/categories'
+import { dailyRouter } from './routes/daily'
 import { problemsRouter } from './routes/problems'
 import { statsRouter } from './routes/stats'
 import { submissionsRouter } from './routes/submissions'
@@ -21,6 +22,7 @@ export function createApp() {
 
   app.use('/api/auth', authRouter)
   app.use('/api/categories', categoriesRouter)
+  app.use('/api/daily', dailyRouter)
   app.use('/api/problems', problemsRouter)
   app.use('/api/submissions', submissionsRouter)
   app.use('/api/stats', statsRouter)

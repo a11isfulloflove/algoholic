@@ -79,6 +79,11 @@ export interface ProblemSolution {
   solutionNotes: string | null
 }
 
+export interface DailyProblemResponse {
+  slug: string
+  date: string
+}
+
 export const LANGUAGES = ['javascript', 'typescript'] as const
 export type Language = (typeof LANGUAGES)[number]
 
