@@ -161,7 +161,10 @@ problemsRouter.get('/:slug', attachUser, async (req, res) => {
   }
 
   const user = req.user
-  const hints = Array.isArray(problem.hints) ? (problem.hints as string[]) : null
+  const hints =
+    Array.isArray(problem.hints) && problem.hints.length > 0
+      ? (problem.hints as string[])
+      : null
   const relatedSlugs = Array.isArray(problem.relatedSlugs)
     ? (problem.relatedSlugs as string[])
     : []
@@ -218,7 +221,7 @@ problemsRouter.get('/:slug', attachUser, async (req, res) => {
     timeLimitMs: problem.timeLimitMs,
     memoryLimitMb: problem.memoryLimitMb,
     targetComplexity: problem.targetComplexity,
-    hintsCount: hints ? hints.length : 0,
+    hintsCount: hints?.length ?? 0,
     hints: user && hints ? hints : null,
     related,
     samples: problem.tests.map((t) => ({
