@@ -75,6 +75,10 @@ problemsRouter.get('/', attachUser, async (req, res) => {
   const { category, difficulty, status, q, page, pageSize } = parsed.data
   const user = req.user
 
+  if (status && !user) {
+    return res.status(400).json({ error: 'the solved/unsolved filter requires logging in' })
+  }
+
   const solvedIds = user
     ? new Set(
         (
