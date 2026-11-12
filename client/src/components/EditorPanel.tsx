@@ -181,7 +181,7 @@ export function EditorPanel({
       <div className={styles.editor}>
         <CodeMirror
           value={code}
-          height="460px"
+          height="600px"
           theme="light"
           extensions={extensions}
           onChange={setCode}
